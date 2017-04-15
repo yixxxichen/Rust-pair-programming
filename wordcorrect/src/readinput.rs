@@ -1,8 +1,9 @@
 //read from file and count words
+use std::collections::HashSet;
 use std::io::{BufRead,BufReader,Read,stdin};
 //standard input and store the result in a string
 pub fn read_input<R: Read>(reader: R) -> Vec<String> {
-    let mut input: Vec<String> = vec![];
+    let mut input: Vec<String> = Vec::new();
     let mut lines = BufReader::new(reader).lines();
     while let Some(Ok(line)) = lines.next() {
         if let Ok(f) = line.to_lowercase().parse() {
