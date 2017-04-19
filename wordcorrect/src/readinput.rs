@@ -1,5 +1,5 @@
 //read from file and count words
-use std::io::{BufRead,BufReader,Read,stdin};
+use std::io::{BufRead,BufReader,Read};
 //standard input and store the result in a string
 pub fn read_input<R: Read>(reader: R) -> Vec<String> {
     let mut input: Vec<String> = Vec::new();
