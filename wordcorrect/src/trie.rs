@@ -4,33 +4,22 @@ use std::hash::Hash;
 use std::string::String;
 use std::clone::Clone;
 
-<<<<<<< HEAD
-struct Trie {
-    value: usize,
-    children: HashMap<char, Trie>,
-=======
 pub struct Trie {
     pub value: usize,
     pub children: HashMap<char, Trie>,
->>>>>>> origin/master
 }
 struct Result{
     pub value: usize,
     pub key: String,
 }
 impl Result{
-<<<<<<< HEAD
-    fn new() -> Result {
-=======
     pub fn new() -> Result {
->>>>>>> origin/master
         Result {
             value: 0,
             key: String::new(),
         }
     }
 }
-<<<<<<< HEAD
 impl Clone for Result{
     fn clone(&self) ->Self{
         let mut result =Result::new();
@@ -41,7 +30,6 @@ impl Clone for Result{
         result
     }
 }
-=======
 // impl Clone for Result{
 //     fn clone(&self) ->Self{
 //         let mut result =Result::new();
@@ -52,7 +40,6 @@ impl Clone for Result{
 //         result
 //     }
 // }
->>>>>>> origin/master
 impl Trie{
     fn new() -> Trie {
         Trie {
@@ -80,79 +67,7 @@ impl Trie{
                     .fetch(path)
         }
     }
-<<<<<<< HEAD
-    fn find_edit(&self, path: & mut String,pathclone: & mut String,cur: & mut String, op: usize)-> Option<Result>{
-        match path.len() {
-            0 =>Some(Result{
-                        value :self.value,
-                        key : cur.clone(),
-                        }
-                    ),
-            _ => {
-                        let mut temppath = pathclone.clone();
-                        let mut curchar = temppath.remove(0);
-                        cur.push(curchar);
-                     let mut max = self.children.get(&curchar).unwrap().find_edit(path,& mut temppath,cur,op).unwrap();
-                        if op>0 {
-                        let mut temp = Result::new();
-                        //insertion 
-                            for key in self.children.keys(){
-                                cur.push(*key);
-                                temp = self.children.get(&key)
-                                .unwrap()
-                                .find_edit(path,pathclone,cur,op-1).unwrap().clone();
-                                if temp.value > max.value{
-                                    max=temp;
 
-                                    }
-                            };
-                            //deletion
-                            if path.len()>=1{
-                            temppath = pathclone.clone();
-                            temppath.remove(0);
-                            curchar = pathclone.remove(0);
-                            cur.push(curchar);
-                            temp = self.children.get(&curchar).unwrap().find_edit(path,& mut temppath,cur,op-1).unwrap().clone();
-                            if temp.value > max.value{
-                                    max=temp;
-
-                                    }
-                                }
-                            //transpose
-                            if path.len()>=2{
-                            temppath = pathclone.clone();
-                            curchar = temppath.remove(0);
-                            temppath.insert(1,curchar);
-                            curchar = temppath.remove(0);
-                            cur.push(curchar);
-                            temp = self.children.get(&curchar).unwrap().find_edit(path,& mut temppath,cur,op-1).unwrap().clone();
-                            if temp.value > max.value{
-                                    max=temp;
-                                    }
-                                }
-                            //replace
-                            if path.len()>0{
-                            for key in self.children.keys(){
-                                temppath = pathclone.clone();
-                                temppath.remove(0);
-                                cur.push(*key);
-                                temp = self.children.get(&key)
-                                .unwrap()
-                                .find_edit(path,& mut temppath,cur,op-1).unwrap().clone();
-                                if temp.value > max.value{
-                                    max=temp;
-                                    }
-                                }
-                            }
-                                    
-                            }
-                            return Some(max);
-                
-
-            }
-        }
-    }
-=======
     // fn find_edit(&self, path: &mut String,cur: &mut String, op: usize)-> Option<&mut Result>{
     //     match path.len() {
     //         0 => Some(&mut Result{
@@ -223,7 +138,6 @@ impl Trie{
     //         })
     //     }
     // }
->>>>>>> origin/master
 }
 
 
