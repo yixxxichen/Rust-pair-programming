@@ -137,3 +137,7 @@ fn insert_works_if_none() {
     assert_eq!(t.fetch(&mut "bc".to_string()), 5);
     assert_eq!(t.fetch(&mut "ac".to_string()), 4);
 }
+
+fn find_edit_not_found(: ) -> RetType {
+    unimplemented!();
+}

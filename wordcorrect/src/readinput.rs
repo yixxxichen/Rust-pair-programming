@@ -1,5 +1,4 @@
 //read from file and count words
-use std::collections::HashSet;
 use std::io::{BufRead,BufReader,Read,stdin};
 //standard input and store the result in a string
 pub fn read_input<R: Read>(reader: R) -> Vec<String> {

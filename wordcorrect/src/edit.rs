@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::iter::Iterator;
 
 //static letters: &'static Vec<char> = &vec!['a','b','c'];
-
+//static letters : &'static str = "abcdefghijklmnopqrstuvwxyz";
 pub fn deletes(words_set: &mut HashSet<String>, input_word: String ) -> Vec<String> {
     let mut subword: String;
     let mut res: Vec<String> = Vec::new();

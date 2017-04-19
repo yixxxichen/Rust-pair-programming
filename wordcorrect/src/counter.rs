@@ -20,7 +20,7 @@ pub fn word_count(input: &str) -> HashMap<String, usize> {
     let slice: &str = lower.as_ref();
     //split the input string and search the word in hashmap, get value and plus 1
     for word in slice.split(|c: char| !c.is_alphabetic()).filter(|s| !s.is_empty()) {
-        *map.entry(dict.to_string()).or_insert(0)+=1;
+        *dict.entry(word.to_string()).or_insert(0)+=1;
     }
     dict
 }
