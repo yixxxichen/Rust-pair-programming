@@ -57,6 +57,7 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
                 return max;
              }
             }
+        cur.pop();
         }
         
 
@@ -70,6 +71,7 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
         		if temp.value>max.value{
         			max = temp;
         		}
+                cur.pop();
         	}
         	//deletion
         	//if we can get a word after deleting current character
@@ -96,6 +98,7 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
         				max = temp;
         			}
         		}
+                cur.pop();
             }
         	//transpose
         	if pathclone.len()>1{
@@ -110,21 +113,21 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
         				max = temp;
         			}
         		}
+                cur.pop();
         		
         	}
                 //replace
-            if pathclone.len()>1{
+            if pathclone.len()>0{
             for key in trie.children.keys(){
             temppath = pathclone.clone();
             temppath.remove(0);
             cur.push(*key);
-            if let Some(currtrie) = trie.children.get(&key){
-            temp = find(currtrie,path,&mut temppath,cur,op-1);
+            currtrie = trie.children.get(&key).unwrap();
+            temp = find(&currtrie,path,&mut temppath,cur,op-1);
             if temp.value>max.value{
                 max = temp;
             }
-            }
-            
+            cur.pop();
             }
         }
             
@@ -137,12 +140,20 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
         	
  
 #[test]
-fn test_find_edit(){
+fn test_find_edit_value(){
     //use super::{trie,Result};
     let mut t = Trie::new();
     t.insert(&mut "ac".to_string(), 4);
     t.insert(&mut "bc".to_string(), 5);
+    t.insert(&mut "cbdca".to_string(),3);
     assert_eq!(find(&t, &mut "bc".to_string(),&mut "bc".to_string(),&mut "".to_string(),2).value, 5);
     assert_eq!(find(&t, &mut "ac".to_string(),&mut "ac".to_string(),&mut "".to_string(),2).value, 4);
+    assert_eq!(find(&t, &mut "ac".to_string(),&mut "ac".to_string(),&mut "".to_string(),2).key, "ac");
     assert_eq!(find(&t, &mut "ed".to_string(),&mut "ed".to_string(),&mut "".to_string(),2).value, 5);
+    assert_eq!(find(&t, &mut "ed".to_string(),&mut "ed".to_string(),&mut "".to_string(),2).key, "bc");
+    assert_eq!(find(&t, &mut "".to_string(),&mut "".to_string(),&mut "".to_string(),2).value, 5);
+    assert_eq!(find(&t, &mut "cb".to_string(),&mut "cb".to_string(),&mut "".to_string(),2).value, 5);
+    assert_eq!(find(&t, &mut "cbdca".to_string(),&mut "cbdca".to_string(),&mut "".to_string(),2).value, 3);
+    assert_eq!(find(&t, &mut "cbcda".to_string(),&mut "cbcda".to_string(),&mut "".to_string(),2).key, "bc");
+    //assert_eq!(find(&t, &mut "cbcda".to_string(),&mut "cbcda".to_string(),&mut "".to_string(),2).value, 3);
 }
