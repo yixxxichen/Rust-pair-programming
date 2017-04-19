@@ -45,16 +45,17 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
         let mut curchar = temppath.remove(0);
         cur.push(curchar);
         let mut max = Result::new();
-        let mut currtrie = trie.children.get(&curchar).unwrap();
-        if currtrie {
-        	max=find(currtrie,path,& mut temppath, cur, op);
+        let mut currtrie = trie.children.get(&curchar).expect("first error");
+        if !currtrie.children.is_empty() {
+        	max = find(currtrie,path,& mut temppath, cur, op);
+            
         }
         else if op>0{
         	let mut temp = Result::new();
         	//insertion
         	for key in trie.children.keys(){
         		cur.push(*key);
-        		currtrie = trie.children.get(&key).unwrap();
+        		currtrie = trie.children.get(&key).expect("insert error");
         		temp = find(currtrie,path,pathclone,cur,op-1);
         		if temp.value>max.value{
         			max = temp;
@@ -73,8 +74,8 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
         		temppath.remove(0);
         		curchar = pathclone.remove(0);
         		cur.push(curchar);
-        		currtrie = trie.children.get(&curchar).unwrap();
-        		if currtrie{
+        		currtrie = trie.children.get(&curchar).expect("delete error");
+        		if !currtrie.children.is_empty(){
         			temp = find(currtrie,path,pathclone,cur,op-1);
         			if temp.value>max.value{
         				max = temp;
@@ -83,13 +84,13 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
             }
         	//transpose
         	if path.len()>1{
-        		temppath.pathclone.clone();
+        		temppath = pathclone.clone();
         		curchar = temppath.remove(0);
         		temppath.insert(1,curchar);
         		curchar = temppath.remove(0);
         		cur.push(curchar);
-        		currtrie = trie.children.get(&curchar).unwrap();
-        		if currtrie {
+        		currtrie = trie.children.get(&curchar).expect("transpose error");
+        		if !currtrie.children.is_empty() {
         			temp = find(currtrie,path,pathclone,cur,op-1);
         			if temp.value>max.value{
         				max = temp;
@@ -102,8 +103,8 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
             temppath = pathclone.clone();
             temppath.remove(0);
             cur.push(*key);
-            currtrie = trie.children.get(&key).unwrap();
-            if currtrie{
+            currtrie = trie.children.get(&key).expect("replace error");
+            if !currtrie.children.is_empty(){
             temp = find(currtrie,path,pathclone,cur,op-1);
             if temp.value>max.value{
                 max = temp;
@@ -111,18 +112,20 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
             }
             
             }
+            
         }
+       return max; 
     }
 }
     
         	
  
-// #[test]
-// fn test_find_edit(){
-// 	use super::{trie,Result};
-//     let mut t = Trie::new();
-//     t.insert(&mut "ac".to_string(), 4);
-//     t.insert(&mut "bc".to_string(), 5);
-//     assert_eq!(find(&mut "bc".to_string(),&mut "bc".to_string(),&mut "".to_string(),2).value, 5);
-//     assert_eq!(find(&mut "ac".to_string(),&mut "ac".to_string(),&mut "".to_string(),2).value, 4);
-// }
+#[test]
+fn test_find_edit(){
+    //use super::{trie,Result};
+    let mut t = Trie::new();
+    t.insert(&mut "ac".to_string(), 4);
+    t.insert(&mut "bc".to_string(), 5);
+    assert_eq!(find(&t, &mut "bc".to_string(),&mut "bc".to_string(),&mut "".to_string(),2).value, 5);
+    assert_eq!(find(&t, &mut "ac".to_string(),&mut "ac".to_string(),&mut "".to_string(),2).value, 4);
+}
