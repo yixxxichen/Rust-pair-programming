@@ -1,43 +1,108 @@
-use std::collections::hash_map::HashMap;
+
+use std::collections::HashMap;
 use std::hash::Hash;
+use std::string::String;
+use std::clone;
 
-struct Trie<K, V> where K: Eq+Hash+Clone, V: Clone {
-    value: Option<V>,
-    children: HashMap<K, Trie<K, V>>,
+struct Trie {
+    value: usize,
+    children: HashMap<char, Trie>,
 }
-
-impl<K, V> Trie<K,V> where K: Eq+Hash+Clone, V: Clone {
-    fn new() -> Trie<K, V> {
+struct Result{
+    pub value: usize,
+    pub key: String,
+}
+impl Trie{
+    fn new() -> Trie {
         Trie {
-            value: None,
+            value: 0,
             children: HashMap::new(),
         }
     }
 
-    fn insert(&mut self, path: Vec<K>, v: V) {
+    fn insert(&mut self, path: &mut String, v: usize) {
         if path.is_empty() {
-            match self.value {
-                Some(_) => {
-                    panic!("key exists")
-                },
-                None => {
-                    self.value = Some(v);
-                },
-            }
+            self.value = v;
             return;
         }
 
-        self.children.entry(path[0].clone())
+        self.children.entry(path.remove(0))
             .or_insert(Trie::new())
-            .insert(path[1..].to_vec(), v)
+            .insert(path, v)
     }
 
-    fn fetch(&self, path: Vec<K>) -> Option<V> {
+    fn fetch(&self, path: &mut String) -> usize {
         match path.len() {
-            0 => self.value.clone(),
-            _ => self.children.get(&path[0])
+            0 => self.value,
+            _ => self.children.get(&path.remove(0))
                     .unwrap()
-                    .fetch(path[1..].to_vec())
+                    .fetch(path)
+        }
+    }
+    fn find_edit(&self, path: &mut String,cur: &mut String, op: usize)-> Option<&mut Result>{
+        match path.len() {
+            0 => Some(&mut Result{
+                        value :self.value,
+                        key : *cur,
+                        }),
+            _ => Some({
+                match self.children.get(path.char_at(0)) {
+                    Some(trie) => Some({
+                        let curchar = path.remove(0);
+                        cur.push(curchar);
+                     return   self.children.get(&curchar).unwrap()
+                    .find_edit(path,cur,op);}),
+                    None => Some(if op>0{
+                        let mut max = Result
+                        {
+                            value:0,
+                            key:"".to_string()
+                        };
+                        //insertion 
+                            for key in self.children.keys(){
+                                cur.push(*key);
+                               let mut temp = self.children.get(&key)
+                                .unwrap()
+                                .find_edit(path,cur,op-1);
+                                if temp.value > max.value{
+                                    max=temp;
+                                    }
+                            };
+                            //deletion
+                            let pathclone = path.clone();
+                            pathclone.remove(0);
+                            let curchar = pathclone.remove(0);
+                            cur.push(curchar);
+                            let mut temp = self.children.get(&curchar).unwrap().find_edit(path,cur,op-1);
+                            if temp.value > max.value{
+                                    max=temp;
+
+                                    }
+                            //transpose
+                            pathclone = path.clone();
+                            curchar = pathclone.remove(0);
+                            pathclone.insert(1,curchar);
+                            curchar = pathclone.remove(0);
+                            cur.push(curchar);
+                            temp = self.children.get(&curchar).unwrap().find_edit(path,cur,op-1);
+                            if temp.value > max.value{
+                                    max=temp;
+                                    }
+                            //replace
+                            for key in self.children.keys(){
+                                path.remove(0);
+                                cur.push(*key);
+                                temp = self.children.get(&key)
+                                .unwrap()
+                                .find_edit(path,cur,op-1);
+                                if temp.value > max.value{
+                                    max=temp;
+                                    }
+                                    return Some(max);
+                            }
+                        })
+                }
+            })
         }
     }
 }
@@ -46,49 +111,25 @@ impl<K, V> Trie<K,V> where K: Eq+Hash+Clone, V: Clone {
 #[test]
 fn fetch_works() {
     let mut t = Trie::new();
-    t.insert(vec![1], 3);
-    let f = t.fetch(vec![1]);
-    assert_eq!(f, Some(3));
+    t.insert(&mut "vec1".to_string(), 3);
+    let f = t.fetch(&mut "vec1".to_string());
+    assert_eq!(f, 3);
 }
 
 #[test]
-fn deep_fetch_works() {
-    let mut t = Trie::new();
-    t.insert(vec![1,2,3], 4);
-
-    let v1 = t.fetch(vec![1]);
-    assert_eq!(v1, None);
-
-    let v2 = t.fetch(vec![1,2,3]);
-    assert_eq!(v2, Some(4));
-}
-
-#[test]
-#[should_panic]
 fn insert_panics_if_exists() {
     let mut t = Trie::new();
-    t.insert(vec![1], 3);
-    t.insert(vec![1], 4);
+    t.insert(&mut "abc".to_string(), 3);
+    t.insert(&mut "bc".to_string(), 4);
 }
 
 #[test]
 fn insert_works_if_none() {
     let mut t = Trie::new();
-    t.insert(vec![1,2,3], 4);
-    t.insert(vec![1,2], 5);
+    t.insert(&mut "ac".to_string(), 4);
+    t.insert(&mut "bc".to_string(), 5);
 
-    assert_eq!(t.fetch(vec![1]), None);
-    assert_eq!(t.fetch(vec![1,2]), Some(5));
-    assert_eq!(t.fetch(vec![1,2,3]), Some(4));
-}
-
-#[test]
-fn works_with_multiple_types() {
-    let mut t = Trie::new();
-    t.insert(vec![1,2,3], "hello");
-    t.insert(vec![1,3,4], "goodbye");
-
-    assert_eq!(t.fetch(vec![1]), None);
-    assert_eq!(t.fetch(vec![1,2,3]), Some("hello"));
-    assert_eq!(t.fetch(vec![1,3,4]), Some("goodbye"));
+    assert_eq!(t.fetch(&mut "a".to_string()), 0);
+    assert_eq!(t.fetch(&mut "bc".to_string()), 5);
+    assert_eq!(t.fetch(&mut "ac".to_string()), 4);
 }
