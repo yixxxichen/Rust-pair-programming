@@ -27,7 +27,7 @@ fn main() {
     }
 
     for word in check_words {
-        if t.fetch(&mut word.to_string()) != 0 {
+        if t.fetch(&mut word.to_string()) != 0 { //change here
             println!("{}, {}", word, word);
         }
     }
@@ -41,21 +41,28 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
 		}
     }
 	else{
-		let mut temppath = pathclone.clone();
+        let mut max = Result::new();
+        let mut temp = Result::new();
+        let mut temppath = pathclone.clone();
+        let mut curchar : char=0;
+        if pathclone.len()!=0{
+        
         let mut curchar = temppath.remove(0);
         cur.push(curchar);
-        let mut max = Result::new();
-        let mut currtrie = trie.children.get(&curchar).expect("first error");
-        if !currtrie.children.is_empty() {
+        
+       // let mut currtrie = Some(Ok(trie.children.get(&curchar))).expect("first error");
+        if let Some(currtrie) = trie.children.get(&curchar) {
         	max = find(currtrie,path,& mut temppath, cur, op);
-            
+             }
         }
-        else if op>0{
-        	let mut temp = Result::new();
+        
+
+         if op>0{
+
         	//insertion
         	for key in trie.children.keys(){
         		cur.push(*key);
-        		currtrie = trie.children.get(&key).expect("insert error");
+        		let mut currtrie = trie.children.get(&key).expect("insert error");
         		temp = find(currtrie,path,pathclone,cur,op-1);
         		if temp.value>max.value{
         			max = temp;
@@ -69,13 +76,13 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
         			key: cur.clone(),
         		}
             }
-        	else{
+        	if pathclone.len()!= 0{
         		temppath = pathclone.clone();
         		temppath.remove(0);
         		curchar = pathclone.remove(0);
         		cur.push(curchar);
-        		currtrie = trie.children.get(&curchar).expect("delete error");
-        		if !currtrie.children.is_empty(){
+        		//let mut currtrie = trie.children.get(&curchar).expect("delete error");
+        		if let Some(currtrie) = trie.children.get(&curchar){
         			temp = find(currtrie,path,pathclone,cur,op-1);
         			if temp.value>max.value{
         				max = temp;
@@ -89,8 +96,8 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
         		temppath.insert(1,curchar);
         		curchar = temppath.remove(0);
         		cur.push(curchar);
-        		currtrie = trie.children.get(&curchar).expect("transpose error");
-        		if !currtrie.children.is_empty() {
+        		//let mut currtrie = trie.children.get(&curchar).expect("transpose error");
+        		if let Some(currtrie) = trie.children.get(&curchar) {
         			temp = find(currtrie,path,pathclone,cur,op-1);
         			if temp.value>max.value{
         				max = temp;
@@ -103,8 +110,8 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
             temppath = pathclone.clone();
             temppath.remove(0);
             cur.push(*key);
-            currtrie = trie.children.get(&key).expect("replace error");
-            if !currtrie.children.is_empty(){
+            //let mut currtrie = trie.children.get(&key).expect("replace error");
+            if let Some(currtrie) = trie.children.get(&curchar){
             temp = find(currtrie,path,pathclone,cur,op-1);
             if temp.value>max.value{
                 max = temp;
@@ -114,8 +121,9 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
             }
             
         }
-       return max; 
+         return max;
     }
+   
 }
     
         	
@@ -128,4 +136,5 @@ fn test_find_edit(){
     t.insert(&mut "bc".to_string(), 5);
     assert_eq!(find(&t, &mut "bc".to_string(),&mut "bc".to_string(),&mut "".to_string(),2).value, 5);
     assert_eq!(find(&t, &mut "ac".to_string(),&mut "ac".to_string(),&mut "".to_string(),2).value, 4);
+    assert_eq!(find(&t, &mut "ab".to_string(),&mut "ab".to_string(),&mut "".to_string(),2).value, 5);
 }
