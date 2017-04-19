@@ -21,14 +21,10 @@ fn main() {
     let dict: HashMap<String, usize> = counter::word_count(&counter::read_input(f));
     let check_words: Vec<String> = readinput::read_input(stdin());
     let mut t:Trie = Trie::new();
-   // dict = counter::word_count(&counter::read_input(f));
-
     for (key,value) in &dict {
         t.insert(&mut key.to_string(), *value);
     }
 
-    //check_words = 
-    //println!("{}",t.fetch(&mut "hello".to_string()));
     for word in check_words {
         if t.fetch(&mut word.to_string()) != 0 {
             println!("{}, {}", word, word);
