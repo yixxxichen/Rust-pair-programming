@@ -27,8 +27,23 @@ fn main() {
     }
 
     for word in check_words {
-        if t.fetch(&mut word.to_string()) != 0 { //change here
-            println!("{}, {}", word, word);
+        // if t.fetch(&mut word.to_string()) != 0 { //change here
+        //     println!("{}, {}", word, word);
+        // }
+        let mut changeword = word.clone();
+        let mut changeword2 = word.clone();
+        
+        let temp = find(&t, &mut changeword,&mut changeword2,&mut "".to_string(),&mut 2).key;
+        if temp.is_empty(){
+            println!("{}, -", word);
+        }
+
+        else if temp == word{
+            println!("{}" , word);
+        }
+
+        else {
+             println!("{}, {}", word, temp);
         }
     }
 }
