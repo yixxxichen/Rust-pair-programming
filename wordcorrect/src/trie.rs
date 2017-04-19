@@ -46,7 +46,7 @@ impl Trie{
                         key : *cur,
                         }),
             _ => Some({
-                match self.children.get(path.char_at(0)) {
+                match self.children.get(path.as_str().char_at(0)) {
                     Some(trie) => Some({
                         let curchar = path.remove(0);
                         cur.push(curchar);
@@ -56,14 +56,18 @@ impl Trie{
                         let mut max = Result
                         {
                             value:0,
-                            key:"".to_string()
+                            key:"".to_string(),
+                        };
+                        let mut temp = Result{
+                            value:0,
+                            key:"".to_string(),
                         };
                         //insertion 
                             for key in self.children.keys(){
                                 cur.push(*key);
-                               let mut temp = self.children.get(&key)
+                                temp = *self.children.get(&key)
                                 .unwrap()
-                                .find_edit(path,cur,op-1);
+                                .find_edit(path,cur,op-1).unwrap();
                                 if temp.value > max.value{
                                     max=temp;
                                     }
@@ -73,7 +77,7 @@ impl Trie{
                             pathclone.remove(0);
                             let curchar = pathclone.remove(0);
                             cur.push(curchar);
-                            let mut temp = self.children.get(&curchar).unwrap().find_edit(path,cur,op-1);
+                            let mut temp = *self.children.get(&curchar).unwrap().find_edit(path,cur,op-1).unwrap();
                             if temp.value > max.value{
                                     max=temp;
 
@@ -84,7 +88,7 @@ impl Trie{
                             pathclone.insert(1,curchar);
                             curchar = pathclone.remove(0);
                             cur.push(curchar);
-                            temp = self.children.get(&curchar).unwrap().find_edit(path,cur,op-1);
+                            temp = *self.children.get(&curchar).unwrap().find_edit(path,cur,op-1).unwrap();
                             if temp.value > max.value{
                                     max=temp;
                                     }
@@ -92,13 +96,13 @@ impl Trie{
                             for key in self.children.keys(){
                                 path.remove(0);
                                 cur.push(*key);
-                                temp = self.children.get(&key)
+                                temp = *self.children.get(&key)
                                 .unwrap()
-                                .find_edit(path,cur,op-1);
+                                .find_edit(path,cur,op-1).unwrap();
                                 if temp.value > max.value{
                                     max=temp;
                                     }
-                                    return Some(max);
+                                    return Some(&mut max);
                             }
                         })
                 }
