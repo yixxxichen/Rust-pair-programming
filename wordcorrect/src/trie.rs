@@ -48,14 +48,14 @@ impl Trie{
             .insert(path, v)
     }
 
-    pub fn fetch(&self, path: &mut String) -> usize {
-        match path.len() {
-            0 => self.value,
-            _ => self.children.get(&path.remove(0))
-                    .unwrap()
-                    .fetch(path)
-        }
-    }
+    // pub fn fetch(&self, path: &mut String) -> usize {
+    //     match path.len() {
+    //         0 => self.value,
+    //         _ => self.children.get(&path.remove(0))
+    //                 .unwrap()
+    //                 .fetch(path)
+    //     }
+    // }
 
    
 }

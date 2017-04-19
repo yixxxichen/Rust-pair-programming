@@ -2,14 +2,12 @@
 //#![allow(dead_code)]
 //#![allow(unused_variables)]
 use std::io::{stdin};
-//use std::collections::HashSet;
 use std::env;
 use std::collections::HashMap;
 use trie::Trie;
 use trie::Result;
 use std::fs::File;
 mod readinput;
-mod edit;
 mod trie;
 mod counter;
 
@@ -27,13 +25,28 @@ fn main() {
     }
 
     for word in check_words {
-        if t.fetch(&mut word.to_string()) != 0 { //change here
-            println!("{}, {}", word, word);
+        // if t.fetch(&mut word.to_string()) != 0 { //change here
+        //     println!("{}, {}", word, word);
+        // }
+        let mut changeword = word.clone();
+        let mut changeword2 = word.clone();
+        
+        let temp = find(&t, &mut changeword,&mut changeword2,&mut "".to_string(), 2).key;
+        if temp.is_empty(){
+            println!("{}, -", word);
+        }
+
+        else if temp == word{
+            println!("{}" , word);
+        }
+
+        else {
+             println!("{}, {}", word, temp);
         }
     }
 }
 
-fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, op: &mut usize)-> Result{
+fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, op: i64)-> Result{
 	if pathclone.len()==0 && trie.value>0 {
 		return Result{
 			value: trie.value,
@@ -41,103 +54,106 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
 		}
     }
 	else{
-        let mut max = Result::new();
-        let mut temp = Result::new();
-        let mut temppath = pathclone.clone();
-        let mut curchar : char='a';
-        let mut currtrie = &Trie::new();
+        let mut max= Result::new();
+        let mut temp: Result;
+        let mut temppath =pathclone.clone();
+        let mut currtrie :&Trie;
         if pathclone.len()>0{
         
-        let mut curchar = temppath.remove(0);
-        cur.push(curchar);
+            let mut curchar = temppath.remove(0);
         
-        if let Some(currtrie) = trie.children.get(&curchar) {
-        	max = find(currtrie,path,& mut temppath, cur, op);
-            if *op==2 && *cur == max.key{
-                return max;
-             }
-            }
-        cur.pop();
-        }
-        
-
-         if *op> 0{
+            if let Some(currtrie) = trie.children.get(&curchar) {
+                cur.push(curchar);
+        	   max = find(currtrie,path,& mut temppath, cur, op);
+                if op==2 && max.key == *path{
+                    return max;
+                    }
+                cur.pop();
+                }
+            //deletion
+            //if we can get a word after deleting current character
+            if op> 0{
+                if pathclone.len()==1 && trie.value>0{
+                temp= Result{
+                    value: trie.value,
+                    key: cur.clone(),
+                   };
+                   if temp.value>max.value{
+                        max = temp;
+                    }
+                }
+                if pathclone.len()==2 &&op==2&& trie.value>0{
+                    temp= Result{
+                        value: trie.value,
+                        key: cur.clone(),
+                   };
+                   if temp.value>max.value{
+                        max = temp;
+                    }
+                 }
+                temppath = pathclone.clone();
+                curchar = pathclone.remove(0);
+                if let Some(currtrie) = trie.children.get(&curchar){
+                    let counter = op-1;
+                    cur.push(curchar);
+                    temp = find(currtrie,path,&mut temppath,cur,counter);
+                    if temp.value>max.value{
+                        max = temp;
+                    }
+                    cur.pop();
+                }
+                //transpose
+                if pathclone.len()>1{
+                    temppath = pathclone.clone();
+                    curchar = temppath.remove(0);
+                    temppath.insert(1,curchar);
+                    curchar = temppath.remove(0);
+                    cur.push(curchar);
+                    if let Some(currtrie) = trie.children.get(&curchar) {
+                        let  counter = op-1;
+                         temp = find(currtrie,path,&mut temppath,cur,counter);
+                         if temp.value>max.value{
+                            max = temp;
+                         }
+                      }
+                    cur.pop();
+                
+                   }
+               // replace
+                for key in trie.children.keys(){
+                    temppath = pathclone.clone();
+                    if temppath.len()>1{
+                        temppath.remove(0);
+                    }
+                    else{temppath="".to_string();}
+                    currtrie = trie.children.get(&key).unwrap();
+                    cur.push(*key);
+                    let counter = op-1;
+                    temp = find(&currtrie,path,&mut temppath,cur,counter);
+                    if temp.value>max.value{
+                        max = temp;
+                         }
+                         cur.pop();
+                       }
+            
+                 }
+            }        
+        if op> 0{
 
         	//insertion
         	for key in trie.children.keys(){
         		cur.push(*key);
         		currtrie = trie.children.get(&key).unwrap();
-                let mut counter = *op-1;
-        		temp = find(&currtrie,path,pathclone,cur,&mut counter);
+                let counter = op-1;
+        		temp = find(&currtrie,path,pathclone,cur,counter);
         		if temp.value>max.value{
         			max = temp;
         		}
                 cur.pop();
         	}
-        	//deletion
-        	//if we can get a word after deleting current character
-            if pathclone.len()>0{
-        	   if pathclone.len()==1 && trie.value>0{
-            	return Result{
-        		  	value: trie.value,
-        	   		key: cur.clone(),
-        	   	   }
-                }
-                if pathclone.len()==2 &&*op==2&& trie.value>0{
-                    return Result{
-                        value: trie.value,
-                        key: cur.clone(),
-                   }
-                 }
-        		temppath = pathclone.clone();
-        		curchar = pathclone.remove(0);
-        		cur.push(curchar);
-        		if let Some(currtrie) = trie.children.get(&curchar){
-                    let mut counter = *op-1;
-        			temp = find(currtrie,path,&mut temppath,cur,&mut counter);
-        			if temp.value>max.value{
-        				max = temp;
-        			}
-        		}
-                cur.pop();
-            
-        	//transpose
-        	   // if pathclone.len()!=1{
-        	   // 	    temppath = pathclone.clone();
-        		  //   curchar = temppath.remove(0);
-        	   // 	    temppath.insert(1,curchar);
-        		  //   curchar = temppath.remove(0);
-        		  //   cur.push(curchar);
-        		  //   if let Some(currtrie) = trie.children.get(&curchar) {
-            //             let mut counter = *op-1;
-        			 //     temp = find(currtrie,path,&mut temppath,cur,&mut counter);
-        			 //     if temp.value>max.value{
-        				//     max = temp;
-        			 //     }
-        		  //     }
-            //         cur.pop();
-        		
-        	   //     }
-                //replace
-                // for key in trie.children.keys(){
-                //     temppath = pathclone.clone();
-                //     if temppath.len()>1{temppath.remove(0);}
-                //     else{temppath="".to_string();}
-                //     cur.push(*key);
-                //     currtrie = trie.children.get(&key).unwrap();
-                //     let mut counter = *op-1;
-                //     temp = find(&currtrie,path,&mut temppath,cur,&mut counter);
-                //     if temp.value>max.value{
-                //         max = temp;
-                //          }
-                //     cur.pop();
-                //     }
-            
-                 }
-            }
+        }
         return max;
-    }
-   
+   }
 }
     
         	
@@ -150,11 +166,11 @@ fn test_find_edit_value(){
     t.insert(&mut "bce".to_string(), 5);
     t.insert(&mut "cbdca".to_string(),3);
     t.insert(&mut "gg".to_string(),100);
-    assert_eq!(find(&t, &mut "bce".to_string(),&mut "bce".to_string(),&mut "".to_string(),&mut 2).value, 5);
-    assert_eq!(find(&t, &mut "acd".to_string(),&mut "acd".to_string(),&mut "".to_string(),&mut 2).value, 4);
-    assert_eq!(find(&t, &mut "acd".to_string(),&mut "acd".to_string(),&mut "".to_string(),&mut 2).key, "acd");
-     assert_eq!(find(&t, &mut "".to_string(),&mut "".to_string(),&mut "".to_string(),&mut 2).key, "gg");
-    assert_eq!(find(&t, &mut "cbdca".to_string(),&mut "cbdca".to_string(),&mut "".to_string(),&mut 2).value, 3);
+    assert_eq!(find(&t, &mut "bce".to_string(),&mut "bce".to_string(),&mut "".to_string(), 2).value, 5);
+    assert_eq!(find(&t, &mut "acd".to_string(),&mut "acd".to_string(),&mut "".to_string(), 2).value, 4);
+    assert_eq!(find(&t, &mut "acd".to_string(),&mut "acd".to_string(),&mut "".to_string(), 2).key, "acd");
+     assert_eq!(find(&t, &mut "".to_string(),&mut "".to_string(),&mut "".to_string(), 2).key, "gg");
+    assert_eq!(find(&t, &mut "cbdca".to_string(),&mut "cbdca".to_string(),&mut "".to_string(), 2).value, 3);
 }
 #[test]
 fn test_find_replace_value(){
@@ -163,8 +179,8 @@ fn test_find_replace_value(){
     t.insert(&mut "bce".to_string(), 5);
     t.insert(&mut "cbdca".to_string(),3);
     t.insert(&mut "gg".to_string(),100);
-    assert_eq!(find(&t, &mut "bed".to_string(),&mut "bed".to_string(),&mut "".to_string(),&mut 2).value, 5);
-    assert_eq!(find(&t, &mut "b".to_string(),&mut "b".to_string(),&mut "".to_string(),&mut 2).value, 100);
+    assert_eq!(find(&t, &mut "bed".to_string(),&mut "bed".to_string(),&mut "".to_string(), 2).value, 5);
+    assert_eq!(find(&t, &mut "b".to_string(),&mut "b".to_string(),&mut "".to_string(), 2).value, 100);
 }
 #[test]
 fn test_find_delete_value(){
@@ -173,6 +189,6 @@ fn test_find_delete_value(){
     t.insert(&mut "bce".to_string(), 5);
     t.insert(&mut "cbdca".to_string(),3);
     t.insert(&mut "gg".to_string(),100);
-    assert_eq!(find(&t, &mut "bcdea".to_string(),&mut "bed".to_string(),&mut "".to_string(),&mut 2).value, 5);
-    assert_eq!(find(&t, &mut "ggag".to_string(),&mut "b".to_string(),&mut "".to_string(),&mut 2).value, 100);
+    assert_eq!(find(&t, &mut "bcdea".to_string(),&mut "bed".to_string(),&mut "".to_string(), 2).value, 5);
+    assert_eq!(find(&t, &mut "ggag".to_string(),&mut "b".to_string(),&mut "".to_string(), 2).value, 100);
 }

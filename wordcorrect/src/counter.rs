@@ -1,5 +1,5 @@
 //read from file and count words
-use std::io::{BufRead,BufReader,Read,stdin};
+use std::io::{BufRead,BufReader,Read};
 use std::collections::HashMap;
 //standard input and store the result in a string
 pub fn read_input<R: Read>(reader: R) -> String {
