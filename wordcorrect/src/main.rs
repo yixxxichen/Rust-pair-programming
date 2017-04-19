@@ -32,12 +32,9 @@ fn main() {
         }
     }
 }
-mod readinput;
-mod edit;
-mod trie;
 
 fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut String, op: usize)-> Result{
-	if pathclone.len()==0 && trie.value>0{
+	if pathclone.len()==0 && trie.value>0 {
 		return Result{
 			value: trie.value,
 			key: cur.clone(),
@@ -47,16 +44,19 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
         let mut max = Result::new();
         let mut temp = Result::new();
         let mut temppath = pathclone.clone();
-        let mut curchar : char=0;
+        let mut curchar : char='a';
+        let mut currtrie = &Trie::new();
         if pathclone.len()!=0{
         
         let mut curchar = temppath.remove(0);
         cur.push(curchar);
         
-       // let mut currtrie = Some(Ok(trie.children.get(&curchar))).expect("first error");
         if let Some(currtrie) = trie.children.get(&curchar) {
         	max = find(currtrie,path,& mut temppath, cur, op);
+            if op==2 && *cur == max.key{
+                return max;
              }
+            }
         }
         
 
@@ -65,8 +65,8 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
         	//insertion
         	for key in trie.children.keys(){
         		cur.push(*key);
-        		let mut currtrie = trie.children.get(&key).expect("insert error");
-        		temp = find(currtrie,path,pathclone,cur,op-1);
+        		currtrie = trie.children.get(&key).unwrap();
+        		temp = find(&currtrie,path,pathclone,cur,op-1);
         		if temp.value>max.value{
         			max = temp;
         		}
@@ -79,29 +79,33 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
         			key: cur.clone(),
         		}
             }
+            if pathclone.len()==2 &&op==2&& trie.value>0{
+                return Result{
+                    value: trie.value,
+                    key: cur.clone(),
+                }
+            }
         	if pathclone.len()!= 0{
         		temppath = pathclone.clone();
         		temppath.remove(0);
         		curchar = pathclone.remove(0);
         		cur.push(curchar);
-        		//let mut currtrie = trie.children.get(&curchar).expect("delete error");
         		if let Some(currtrie) = trie.children.get(&curchar){
-        			temp = find(currtrie,path,pathclone,cur,op-1);
+        			temp = find(currtrie,path,&mut temppath,cur,op-1);
         			if temp.value>max.value{
         				max = temp;
         			}
         		}
             }
         	//transpose
-        	if path.len()>1{
+        	if pathclone.len()>1{
         		temppath = pathclone.clone();
         		curchar = temppath.remove(0);
         		temppath.insert(1,curchar);
         		curchar = temppath.remove(0);
         		cur.push(curchar);
-        		//let mut currtrie = trie.children.get(&curchar).expect("transpose error");
         		if let Some(currtrie) = trie.children.get(&curchar) {
-        			temp = find(currtrie,path,pathclone,cur,op-1);
+        			temp = find(currtrie,path,&mut temppath,cur,op-1);
         			if temp.value>max.value{
         				max = temp;
         			}
@@ -109,19 +113,20 @@ fn find(trie: & Trie, path: & mut String,pathclone: & mut String,cur: & mut Stri
         		
         	}
                 //replace
+            if pathclone.len()>1{
             for key in trie.children.keys(){
             temppath = pathclone.clone();
             temppath.remove(0);
             cur.push(*key);
-            //let mut currtrie = trie.children.get(&key).expect("replace error");
-            if let Some(currtrie) = trie.children.get(&curchar){
-            temp = find(currtrie,path,pathclone,cur,op-1);
+            if let Some(currtrie) = trie.children.get(&key){
+            temp = find(currtrie,path,&mut temppath,cur,op-1);
             if temp.value>max.value{
                 max = temp;
             }
             }
             
             }
+        }
             
         }
          return max;
@@ -139,5 +144,5 @@ fn test_find_edit(){
     t.insert(&mut "bc".to_string(), 5);
     assert_eq!(find(&t, &mut "bc".to_string(),&mut "bc".to_string(),&mut "".to_string(),2).value, 5);
     assert_eq!(find(&t, &mut "ac".to_string(),&mut "ac".to_string(),&mut "".to_string(),2).value, 4);
-    assert_eq!(find(&t, &mut "ab".to_string(),&mut "ab".to_string(),&mut "".to_string(),2).value, 5);
+    assert_eq!(find(&t, &mut "ed".to_string(),&mut "ed".to_string(),&mut "".to_string(),2).value, 5);
 }
