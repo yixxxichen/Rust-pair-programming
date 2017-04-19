@@ -46,7 +46,7 @@ impl Trie{
                         key : *cur,
                         }),
             _ => Some({
-                match self.children.get(path.as_str().char_at(0)) {
+                match self.children.get(&path.clone().chars().next().unwrap()) {
                     Some(trie) => Some({
                         let curchar = path.remove(0);
                         cur.push(curchar);
