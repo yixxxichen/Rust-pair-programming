@@ -72,7 +72,7 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                 }
             //deletion
             //if we can get a word after deleting current character
-            if op> 0{
+            if op > 0{
                 if pathclone.len()==1 && trie.value>0{
                 temp= Result{
                     value: trie.value,
@@ -92,7 +92,7 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                     }
                  }
                 temppath = pathclone.clone();
-                curchar = pathclone.remove(0);
+                curchar = temppath.remove(0);
                 if let Some(currtrie) = trie.children.get(&curchar){
                     let counter = op-1;
                     cur.push(curchar);
@@ -122,6 +122,7 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                // replace
                 for key in trie.children.keys(){
                     temppath = pathclone.clone();
+                    println!("{}", temppath);
                     if temppath.len()>1{
                         temppath.remove(0);
                     }
@@ -129,6 +130,7 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                     currtrie = trie.children.get(&key).unwrap();
                     cur.push(*key);
                     let counter = op-1;
+                    println!("{} {} {}", cur,counter,temppath);
                     temp = find(&currtrie,path,&mut temppath,cur,counter);
                     if temp.value>max.value{
                         max = temp;
