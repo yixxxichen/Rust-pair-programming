@@ -1,4 +1,3 @@
-
 //#![allow(dead_code)]
 //#![allow(unused_variables)]
 use std::io::{stdin};
@@ -91,17 +90,37 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                         max = temp;
                     }
                  }
+                 if pathclone.len()>1{
                 temppath = pathclone.clone();
+                temppath.remove(0);
                 curchar = temppath.remove(0);
                 if let Some(currtrie) = trie.children.get(&curchar){
                     let counter = op-1;
                     cur.push(curchar);
+                    //println!("{} {} {}", temppath,cur,counter);
                     temp = find(currtrie,path,&mut temppath,cur,counter);
                     if temp.value>max.value{
                         max = temp;
                     }
                     cur.pop();
+                    if pathclone.len()>2 &&op==2{
+                        temppath = pathclone.clone();
+                        temppath.remove(0);
+                        temppath.remove(0);
+                        curchar = temppath.remove(0);
+                        if let Some(currtrie) = trie.children.get(&curchar){
+                            let counter = 0;
+                            cur.push(curchar);
+                            //println!("{} {} {}", temppath,cur,counter);
+                            temp = find(currtrie,path,&mut temppath,cur,counter);
+                            if temp.value>max.value{
+                                max = temp;
+                                }
+                        cur.pop();
+                        }
+                    }
                 }
+            }
                 //transpose
                 if pathclone.len()>1{
                     temppath = pathclone.clone();
