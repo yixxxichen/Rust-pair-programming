@@ -14,20 +14,20 @@ mod counter;
 fn main() {
     let args: Vec<_> = env::args().collect();
     if args.len() != 2 {
-        panic!("Missing input file");
+        panic!("Missing input file"); //check training file
     }
     let f = File::open(&args[1]).expect("Error opening training file!");
-    let dict: HashMap<String, usize> = counter::word_count(&counter::read_input(f));
+    //calculate the freq. of training file and stored in a hashmap
+    let dict: HashMap<String, usize> = counter::word_count(&counter::read_input(f)); 
+    //read input.txt and store in a vector
     let check_words: Vec<String> = readinput::read_input(stdin());
+    //initialize the Trie
     let mut t:Trie = Trie::new();
     for (key,value) in &dict {
         t.insert(&mut key.to_string(), *value);
     }
-
+    //check each word in input.txt
     for word in check_words {
-        // if t.fetch(&mut word.to_string()) != 0 { //change here
-        //     println!("{}, {}", word, word);
-        // }
         let mut changeword = word.clone();
         let mut changeword2 = word.clone();
         
@@ -122,7 +122,7 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                // replace
                 for key in trie.children.keys(){
                     temppath = pathclone.clone();
-                    println!("{}", temppath);
+                    //println!("{}", temppath);
                     if temppath.len()>1{
                         temppath.remove(0);
                     }
@@ -130,7 +130,7 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                     currtrie = trie.children.get(&key).unwrap();
                     cur.push(*key);
                     let counter = op-1;
-                    println!("{} {} {}", cur,counter,temppath);
+                    //println!("{} {} {}", cur,counter,temppath);
                     temp = find(&currtrie,path,&mut temppath,cur,counter);
                     if temp.value>max.value{
                         max = temp;
