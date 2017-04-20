@@ -97,7 +97,7 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                 if let Some(currtrie) = trie.children.get(&curchar){
                     let counter = op-1;
                     cur.push(curchar);
-                    //println!("{} {} {}", temppath,cur,counter);
+
                     temp = find(currtrie,path,&mut temppath,cur,counter);
                     if temp.value>max.value{
                         max = temp;
@@ -111,7 +111,7 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                         if let Some(currtrie) = trie.children.get(&curchar){
                             let counter = 0;
                             cur.push(curchar);
-                            //println!("{} {} {}", temppath,cur,counter);
+
                             temp = find(currtrie,path,&mut temppath,cur,counter);
                             if temp.value>max.value{
                                 max = temp;
