@@ -14,7 +14,6 @@ impl Graph{
                 self.map.insert(vertices[0].to_string(), vertices[1..].to_vec());
             }
         }
-    pub fn 
 }
 
 #[test]
