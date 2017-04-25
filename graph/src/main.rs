@@ -39,24 +39,3 @@ pub fn read_input<R: Read>(reader: R) -> Graph {
     }
     return graph;
 }
-
-// pub fn set_index(index_map: &HashMap<String,usize>, vertices: &Vec<&str>,mut count:usize) {
-//     //let mut count = 0;
-//     for s in vertices {
-//         if !index_map.contains_key(&s.to_string()) {
-//             index_map.insert(s.to_string(), count);
-//             count += 1;
-//         }
-//     }
-
-// }
-// #[test]
-// fn set_index_work() {
-//     let mut t: HashMap<String,usize> = HashMap::new();
-//     let vector = vec!["aa","bb","cc","d"];
-//     set_index(&t,&vector, 0 as usize);
-//     assert_eq!(t.get(&"aa".to_string()),Some(&0) );
-//     //assert_eq!(t.vertex.get(&'d'),Some(&3) );
-//     assert_eq!(t.get(&"zz".to_string()),None );
-//     //t.insert(&mut "bc".to_string(), 4);
-// }
