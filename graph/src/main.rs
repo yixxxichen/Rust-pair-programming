@@ -20,6 +20,7 @@ pub fn read_input<R: Read>(reader: R) -> Graph {
     let mut graph = Graph::new();
     let mut hash:HashMap<String,Vec<&str>> = HashMap::new();
     let mut lines = BufReader::new(reader).lines();
+    let mut index_map = HashMap<String,usize>;
     let mut counter = 0;
     while let Some(Ok(line)) = lines.next() {
         if line == "999" {break}
@@ -33,8 +34,29 @@ pub fn read_input<R: Read>(reader: R) -> Graph {
                 // let other_nodes = &vertices[1..].to_vec();
                 // let node = &vertices[0].to_string();
                 // hash.insert(node.clone(),other_nodes.clone());
-                hash.insert(vertices[0].to_string(),vertices[..].to_vec().clone());
+                //hash.insert(vertices[0].to_string(),vertices[..].to_vec().clone());
             }
     }
     return graph;
 }
+
+// pub fn set_index(index_map: &HashMap<String,usize>, vertices: &Vec<&str>,mut count:usize) {
+//     //let mut count = 0;
+//     for s in vertices {
+//         if !index_map.contains_key(&s.to_string()) {
+//             index_map.insert(s.to_string(), count);
+//             count += 1;
+//         }
+//     }
+
+// }
+// #[test]
+// fn set_index_work() {
+//     let mut t: HashMap<String,usize> = HashMap::new();
+//     let vector = vec!["aa","bb","cc","d"];
+//     set_index(&t,&vector, 0 as usize);
+//     assert_eq!(t.get(&"aa".to_string()),Some(&0) );
+//     //assert_eq!(t.vertex.get(&'d'),Some(&3) );
+//     assert_eq!(t.get(&"zz".to_string()),None );
+//     //t.insert(&mut "bc".to_string(), 4);
+// }
