@@ -1,3 +1,96 @@
+<<<<<<< HEAD
+/*
+* word correction
+*
+* Reads text from the corpus text and 
+* Count the frequency of each word, then correct the candidate word in input text, output with the most frequetly
+* used one
+* 
+* Background
+* 
+* The purpose of correct is to find possible corrections for misspelled words. It consists of two phases: 
+* The first phase is a training module, which consumes a corpus of correctly spelled words and counts the 
+* number of occurrences of each word. The second phase uses the results of the first to check individual words. 
+* Specifically, it checks whether each word is spelled correctly according to the training module and, if not, 
+* whether “small edits” can reach a variant that is correctly spelled.
+* 
+* Given a word, an edit action is one of the following:
+*   the deletion of one letter;
+*
+*   the transposition of two neighboring letters;
+*
+*   the replacement of one letter with another letter; and
+*
+*   the insertion of a letter at any position.
+*
+*   In this context, Norvig suggests that “small edits” means the application of one edit action possibly 
+*   followed by the application of a second one to the result of the first.
+*   Once the second part has generated all possible candidate for a potentially misspelled word, 
+*   it picks the most frequently used one from the training corpus. If none of the candidates is a correct word, 
+*   correct reports a failure.
+*
+* INPUT
+*
+* The input format is using two standard input consuming text. It could contain anything like words, numbers or some marks.
+* writtten in ASCII.
+* 
+*    Hello world! Where are you now? 
+*    www333
+*    github.com/rust
+*    !!!!!@@@@@@@
+*
+* Any non-alphabetic will be regarded as noise and will not be counted:
+*
+*    23232
+*    ++--!!!@@
+*    ...???''''""""
+*
+*
+* The input terminates with end-of-file.
+*
+*
+* OUTPUT
+*
+* The correct program consumes a training file on the command line and then reads words—one per line—from 
+* standard input. For each word from standard in, correct prints one line. The line consists of just the word 
+* if it is spelled correctly. If the word is not correctly spelled, correct prints the word and the best 
+* improvement or “-” if there aren’t any improvements found.
+*
+*  hello
+*
+*  hell, hello
+*
+*  word
+*
+*  wordl, world
+*
+*  wor, world
+*
+*  wo, word
+*
+*  w, -
+*
+* ASSUMPTIONS
+*
+*  - Words are reading according to the language's reading routines,
+*
+*  - A word contained numbers will be count only the alphabetic character
+*    and ignore the numbers.
+*
+*  - All the symbol, space and numbers will be considered as noise and ignored. 
+*
+*  - The input only terminate in the end-of-file, which is kind of unconvenient
+*    if you want to use console to input your data.
+*
+*  - Once the word has been edited, we would pick the most frequently used one after
+*    two editions.
+* 
+*  - Except fot the normal edition, we add the corner case handler to accelerate the algorithm
+*
+*  
+*/
+=======
+>>>>>>> 7a6cdabd1d54f8ce2e0980b7aae2d0728eca04f0
 //#![allow(dead_code)]
 //#![allow(unused_variables)]
 use std::io::{stdin};
@@ -44,7 +137,25 @@ fn main() {
         }
     }
 }
-
+/*
+* This is the main search function for this program. We implement the DFS(Depth-First-Search)+Regression 
+* Algorithm to travel the whole trie and find all the candidate word, then pick the most frequently one.
+* 
+* Input : trie: The trie made from corpus.txt, contains all the word
+*         path: The misspelled word
+*         pathclone: The remained string need to match
+*         cur: The trie path
+*         op: The edit times left for current matching
+*
+* The stop condition is that current trie path consist a word and match the input/edited word.
+* 
+* We separate each character in the string and find the matched node in current trie. In the meantime,
+* we also edit the word in case we can't find the original word in tries. But we set the original search
+* with the highest priority.
+* 
+* Output is a Struct with key: String the most frequently used word
+*                       value: maximum frequency.
+*/
 fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, op: i64)-> Result{
 	if pathclone.len()==0 && trie.value>0 {
 		return Result{
@@ -97,7 +208,10 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                 if let Some(currtrie) = trie.children.get(&curchar){
                     let counter = op-1;
                     cur.push(curchar);
+<<<<<<< HEAD
+=======
 
+>>>>>>> 7a6cdabd1d54f8ce2e0980b7aae2d0728eca04f0
                     temp = find(currtrie,path,&mut temppath,cur,counter);
                     if temp.value>max.value{
                         max = temp;
@@ -111,7 +225,10 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                         if let Some(currtrie) = trie.children.get(&curchar){
                             let counter = 0;
                             cur.push(curchar);
+<<<<<<< HEAD
+=======
 
+>>>>>>> 7a6cdabd1d54f8ce2e0980b7aae2d0728eca04f0
                             temp = find(currtrie,path,&mut temppath,cur,counter);
                             if temp.value>max.value{
                                 max = temp;
@@ -141,7 +258,6 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                // replace
                 for key in trie.children.keys(){
                     temppath = pathclone.clone();
-                    //println!("{}", temppath);
                     if temppath.len()>1{
                         temppath.remove(0);
                     }
@@ -149,7 +265,6 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                     currtrie = trie.children.get(&key).unwrap();
                     cur.push(*key);
                     let counter = op-1;
-                    //println!("{} {} {}", cur,counter,temppath);
                     temp = find(&currtrie,path,&mut temppath,cur,counter);
                     if temp.value>max.value{
                         max = temp;
