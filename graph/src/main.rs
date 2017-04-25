@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
+#![warn(unused_mut)]
+#![warn(unused_imports)]
 use std::io::{BufRead,BufReader,stdin,Read};
 use graph::Graph;
 use std::env;
