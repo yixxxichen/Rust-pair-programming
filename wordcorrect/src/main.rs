@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
 * word correction
 *
@@ -88,6 +89,8 @@
 *
 *  
 */
+=======
+>>>>>>> 7a6cdabd1d54f8ce2e0980b7aae2d0728eca04f0
 //#![allow(dead_code)]
 //#![allow(unused_variables)]
 use std::io::{stdin};
@@ -205,6 +208,10 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                 if let Some(currtrie) = trie.children.get(&curchar){
                     let counter = op-1;
                     cur.push(curchar);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7a6cdabd1d54f8ce2e0980b7aae2d0728eca04f0
                     temp = find(currtrie,path,&mut temppath,cur,counter);
                     if temp.value>max.value{
                         max = temp;
@@ -218,6 +225,10 @@ fn find(trie: & Trie, path: & String,pathclone: & mut String,cur: & mut String, 
                         if let Some(currtrie) = trie.children.get(&curchar){
                             let counter = 0;
                             cur.push(curchar);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7a6cdabd1d54f8ce2e0980b7aae2d0728eca04f0
                             temp = find(currtrie,path,&mut temppath,cur,counter);
                             if temp.value>max.value{
                                 max = temp;
