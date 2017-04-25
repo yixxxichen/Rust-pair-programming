@@ -24,19 +24,15 @@ pub fn read_input<R: Read>(reader: R) -> Graph {
     let mut counter = 0;
     while let Some(Ok(line)) = lines.next() {
         if line == "999" {break}
-        //if let Ok(f) = line.to_lowercase().parse() {
-            let mut vertices: Vec<&str> = line.clone().split_whitespace().collect();
-            // = temp;
+            let temp = line.clone();
             
+            let mut vertices: Vec<&str> = temp.split_whitespace().collect();            
             if vertices.is_empty() {
                 println!("Found empty line");
             }
             else {
                 graph.set_index(&vertices,counter);
-
-            }
-
-        //}        
+            }    
     }
     return graph;
 }
