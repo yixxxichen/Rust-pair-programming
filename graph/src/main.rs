@@ -30,7 +30,11 @@ pub fn read_input<R: Read>(reader: R) -> Graph {
                 println!("Found empty line");
             }
             else {
-                graph.set_index(vertices.as_ref();
+                let mut nodes:Vec<String> = vec![];
+                for s in &vertices {
+                    nodes.push(s.to_string());
+                }
+                graph.set_index(&nodes);
             }
     }
     return graph;
