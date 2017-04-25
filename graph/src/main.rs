@@ -30,7 +30,7 @@ pub fn read_input<R: Read>(reader: R) -> Graph {
             let temp = line.clone();
             let mut vertices: Vec<&str> = temp.split_whitespace().collect();
             if vertices.is_empty() {
-                println!("Found empty line");
+                panic!("Found empty line");
             }
             else {
                 let mut nodes:Vec<String> = vec![];
