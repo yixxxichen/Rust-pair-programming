@@ -1,7 +1,3 @@
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![warn(unused_mut)]
-#![warn(unused_imports)]
 use std::collections::HashMap;
 use std::collections::HashSet;
 #[derive(Eq, PartialEq, Debug, Clone)]
@@ -28,14 +24,14 @@ impl Graph{
             None => {
                 println!("missing node");                              
             }
-            Some(mut n) => {
+            Some(n) => {
                 if n.is_empty() {
                     new_neighbor.push(new_node);
                     empty = 1;
                 }     
                 else {
                       for i in 0..n.len(){
-                        let mut value = &n[i].to_string();               
+                        let value = &n[i].to_string();               
                         if !value.eq(&new_node.to_string()) {
                             check = 0;
                         }
@@ -97,9 +93,6 @@ impl Graph{
     }
 }
     
-
-
-
 #[test]
 fn set_index_work() {
     let mut t = Graph::new();
