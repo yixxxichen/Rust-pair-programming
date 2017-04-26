@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 use std::usize::MAX;
 /*
-* Use adjacency list to store the node information
+* Input: map: the graph which is using hashmap to store the node information where keys are the node and the value is a vector consist of 
+* neighbor node.
+*  The visit is a hashmap which stores the node visited preventing the search stuck in a loop.
 */
 pub fn bfs(map : &HashMap<String,Vec<String>>,a :String, b :String)-> Vec<String>{
 	let mut queue = vec![a.clone()];
-	let length = map.capacity();
 	let mut visit = HashMap::new();
 	visit.insert(a.clone(),1);
 	let mut path : HashMap<String, Vec<String>> = HashMap::new();
