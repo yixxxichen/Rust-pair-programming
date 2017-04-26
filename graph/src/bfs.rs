@@ -31,6 +31,9 @@ pub fn bfs(map : &HashMap<String,Vec<String>>,a :String, b :String)-> Vec<String
 		}
 		else {
 			let node = map.get(&now.clone()).unwrap().clone();
+			if node.is_empty() {
+				return Vec::new();
+			}
 			for i in node {
 				if !(visit.contains_key(&i.clone())){
 					queue.push(i.clone());
