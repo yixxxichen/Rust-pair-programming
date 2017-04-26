@@ -15,7 +15,13 @@ fn main() {
         panic!("Missing input file"); //check training file
     }
     let f = File::open(&args[1]).expect("Error opening graph file!");
-    //let mut graph = Graph::new()
+    let mut graph = Graph::new();
+    graph = read_input(f);
+    let newgraph = graph.change_map();
+    let res_a = vec!["b".to_string(),"c".to_string()];
+    let res_b = vec!["a".to_string()];
+    assert_eq!(newgraph.map.get(&"a".to_string()),Some(&res_a));
+    assert_eq!(newgraph.map.get(&"b".to_string()),Some(&res_b));
     
 }
 pub fn read_input<R: Read>(reader: R) -> Graph {

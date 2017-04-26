@@ -3,6 +3,7 @@
 #![warn(unused_mut)]
 #![warn(unused_imports)]
 use std::collections::HashMap;
+use std::collections::HashSet;
 #[derive(Eq, PartialEq, Debug, Clone)]
 pub struct Graph {
     pub map: HashMap<String,Vec<String>>
@@ -25,7 +26,7 @@ impl Graph{
         let mut empty = 0;
         match self.map.get(&node.to_string()){
             None => {
-                panic!("missing node");                              
+                println!("missing node");                              
             }
             Some(mut n) => {
                 if n.is_empty() {
@@ -82,6 +83,22 @@ impl Graph{
             }
         }
         newmap
+    }
+    pub fn size(&mut self) -> usize {
+        let mut hash:HashSet<&str> = HashSet::new();
+        for (vertex,neighbors) in self.map.iter(){
+            for s in neighbors {
+               hash.insert(s);
+            }
+            hash.insert(vertex);
+        }
+        let input_length = hash.len();
+        let map_length = self.map.len();
+        if input_length == map_length {
+            input_length
+        }else {
+            panic!("wrong number of nodes");
+        }
     }
 }
     
@@ -157,6 +174,18 @@ fn change_map_change_value() {
 }
 
 #[test]
+fn change_map_change_one(){
+    let mut t = Graph::new();
+    let vector_a = vec!["a".to_string(),"b".to_string(),"c".to_string()];
+    let vector_b = vec!["b".to_string()];
+    let res_b = vec!["a".to_string()];
+    t.set_index(&vector_a.to_vec());
+    t.set_index(&vector_b.to_vec());
+    let newt = t.change_map();
+    assert_eq!(newt.map.get(&"b".to_string()),Some(&res_b) );
+}
+
+#[test]
 fn change_map_not_change_value() {
     let mut t = Graph::new();
     let vector_a = vec!["a".to_string(),"b".to_string(),"c".to_string()];
@@ -173,4 +202,28 @@ fn change_map_not_change_value() {
     assert_eq!(newt.map.get(&"b".to_string()),Some(&res_b) );
     assert_eq!(newt.map.get(&"c".to_string()),Some(&res_c) );
 
+}
+
+// #[test]
+// fn test_size_wrong() {
+//     let mut t = Graph::new();
+//     let vector_a = vec!["a".to_string(),"b".to_string(),"c".to_string()];
+//     let vector_b = vec!["b".to_string(),"c".to_string(),"a".to_string()];
+//     t.set_index(&vector_a.to_vec());
+//     t.set_index(&vector_b.to_vec());
+//     let mut newt = t.change_map();
+//     assert_eq!(newt.size(),2);
+// }
+
+#[test]
+fn test_size_ok() {
+    let mut t = Graph::new();
+    let vector_a = vec!["a".to_string(),"b".to_string(),"c".to_string()];
+    let vector_b = vec!["b".to_string(),"c".to_string(),"a".to_string()];
+    let vector_c = vec!["c".to_string()];
+    t.set_index(&vector_a.to_vec());
+    t.set_index(&vector_b.to_vec());
+    t.set_index(&vector_c.to_vec());
+    let mut newt = t.change_map();
+    assert_eq!(newt.size(),3);
 }
