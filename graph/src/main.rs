@@ -1,34 +1,43 @@
-find path
+// find path
 
-Read a graph from graph.dat. And select a start point and an end point,
-This program will find the shortest path and print out. If no path is found,
-it will print a message.
+// Read a graph from graph.dat. And select a start point and an end point,
+// This program will find the shortest path and print out. If no path is found,
+// it will print a message.
 
-Each line is a list of word, where the first word names some node 
-in the graph and the remaining words enumerate its neighbors.
+// Each line is a list of word, where the first word names some node 
+// in the graph and the remaining words enumerate its neighbors.
+
+// The user enters a start node and an end node on stdin, one at a time. 
+// A query consists of two node names, a starting node and an ending node. 
+// The program then prints out a path between the nodes, or a message - "No path found".
+
+// INPUT & OUTPUT:
+// $ cat graph.dat
+//     a b b d
+//     b d
+//     c d
+//     d
 
 
+// $ cargo run graph.dat
+// ->  a d
+//     a d
+// ->  a c
+//     a d c 
+// ->  a b c 
+//     Input size is not 2
+// ->  a z
+//     START or END point not found
+     
+// ASSUMPTIONS:
+// - Each node must take one line, no empty line is allowed in graph.dat, and 
+// duplicated neighbors in one line are allowed.
 
-The user enters a start node and an end node on stdin, one at a time. 
-A query consists of two node names, a starting node and an ending node. 
-The program then prints out a path between the nodes, or a message - "No path found".
+// - Every node mentioned as a neighbor must start a line as well, 
+// and no node may start more than one line. 
 
-INPUT & OUTPUT:
-$ cat graph.dat
-    a b b d
-    b d
-    c d
-    d
-
-Each node must take one line, no empty line is allowed in graph.dat, and 
-duplicated neighbors in one line are allowed.
-Every node mentioned as a neighbor must start a line as well, 
-and no node may start more than one line. Otherwise it will panic with "wrong number of nodes".
-
-$ cargo run graph.dat
-->  a d
-    a d
-->  
+// - There must be one start node and one end node, if they are not in the graph,
+// it will display a message. The input will only terminate with 999.
 
 
 
@@ -80,22 +89,25 @@ pub fn find_path<R: Read, W:Write>(reader: R, writer: &mut W, graph: Graph )  {
         if line == "999" {break}
         let input_nodes: Vec<&str> = line.split_whitespace().collect();
         if input_nodes.len() != 2 {
-            panic!("wrong start or end node");
+            println!("Input size is not 2");
         }
         else {
-            
-            let res = bfs::bfs(&graph.map,input_nodes[0].to_string(),input_nodes[1].to_string());
-            if res.len() == 0 {
-                write!(writer, "No path found.\n").unwrap();
+            if graph.map.contains_key(&input_nodes[0].to_string()) && graph.map.contains_key(&input_nodes[1].to_string()) {
+                let res = bfs::bfs(&graph.map,input_nodes[0].to_string(),input_nodes[1].to_string());
+                    if res.len() == 0 {
+                        write!(writer, "No path found.\n").unwrap();
+                    }
+                    else {
+                        for c in res{
+                            write!(writer, "{} ",c.clone()).unwrap();
+                        }
+                        write!(writer, "\n").unwrap();
+                    }
+                    
             }
             else {
-                for c in res{
-                    write!(writer, "{} ",c.clone()).unwrap();
-                }
-                write!(writer, "\n").unwrap();
+                println!("START or END point not found");
             }
         }
-        
     }
-
 }
