@@ -66,6 +66,7 @@ pub fn find_path<R: Read, W:Write>(reader: R, writer: &mut W, graph: Graph )  {
                 write!(writer, "\n").unwrap();
             }
         }
+        break
     }
 
 }
