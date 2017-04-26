@@ -1,5 +1,8 @@
 use std::collections::HashMap;
 use std::usize::MAX;
+/*
+*
+*/
 pub fn bfs(map : &HashMap<String,Vec<String>>,a :String, b :String)-> Vec<String>{
 	let mut queue = vec![a.clone()];
 	let length = map.capacity();
@@ -31,7 +34,12 @@ pub fn bfs(map : &HashMap<String,Vec<String>>,a :String, b :String)-> Vec<String
 			}
 		}
 	}
-	ans
+	if min != MAX{
+		return ans;
+	}else {
+		return Vec::new();
+	}
+	
 }
 
 #[test]
@@ -41,7 +49,9 @@ fn test_bfs(){
 	map.insert("b".to_string(),vec!["a".to_string(),"d".to_string()]);
 	map.insert("c".to_string(),vec!["d".to_string()]);
 	map.insert("d".to_string(),vec!["a".to_string(),"b".to_string(),"c".to_string()]);
+	map.insert("e".to_string(),vec!["e".to_string()]);
 	assert_eq!(bfs(&map,"a".to_string(),"c".to_string()),vec!["a","d","c"]);
 	assert_eq!(bfs(&map,"c".to_string(),"a".to_string()), vec!["c","d","a"]);
 	assert_eq!(bfs(&map,"b".to_string(),"a".to_string()), vec!["b","a"]);
+	assert_eq!(bfs(&map,"e".to_string(),"a".to_string()).is_empty(), true);
 	}
