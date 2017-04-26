@@ -15,7 +15,7 @@
 // $ cat graph.dat
 //     a b b d
 //     b d
-//     c d
+//     c 
 //     d
 
 
@@ -23,13 +23,16 @@
 // ->  a d
 //     a d
 // ->  a c
-//     a d c 
+//     No path found.
 // ->  a b c 
 //     Input size is not 2
 // ->  a z
 //     START or END point not found
      
 // ASSUMPTIONS:
+// - The graph is an undirected graph. For node and neighbors: a b c,
+// a is connected with b and with c.
+
 // - Each node must take one line, no empty line is allowed in graph.dat, and 
 // duplicated neighbors in one line are allowed.
 
@@ -38,6 +41,7 @@
 
 // - There must be one start node and one end node, if they are not in the graph,
 // it will display a message. The input will only terminate with 999.
+
 
 
 
