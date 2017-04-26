@@ -8,7 +8,7 @@ use std::env;
 use std::collections::HashMap;
 use std::fs::File;
 mod graph;
-//mod bfs;
+mod bfs;
 fn main() {
     let args: Vec<_> = env::args().collect();
     if args.len() != 2 {
