@@ -1,15 +1,17 @@
+// * bfs
+// *
+// * Input: map: the graph which is using hashmap to store the node information where keys are the node 
+// * and the value is a vector consist of neighbor vertices.
+// *
+// * a: The starting point
+// * b: The ending point
+// *
+// * Output: a vector which includes all the nodes of the shortest path.
+// * 
+// * The algorithm use breadth first search 
 use std::collections::HashMap;
 use std::usize::MAX;
-/*
-* Input: map: the graph which is using hashmap to store the node information where keys are the node 
-* and the value is a vector consist of neighbor vertices.
-* a: The starting point
-* b: The ending point
-*
-* Output: a vector which includes all the nodes of the shortest path.
-* 
-* The algorithm use breadth first search 
-*/
+
 pub fn bfs(map : &HashMap<String,Vec<String>>,a :String, b :String)-> Vec<String>{
 	let mut queue = vec![a.clone()];
 	let mut visit = HashMap::new();

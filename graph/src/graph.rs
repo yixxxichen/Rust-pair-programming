@@ -1,4 +1,31 @@
+// graph
+// Graph uses a hashmap as its stucture. Its key is a string of a node,
+// and its values are a vector including all neighbors.
 
+// Function - new()
+// Create a new Graph
+
+// Function - set_index()
+// It takes a vector of strings, the first element is the key 
+// and rest elements are the value of Graph. 
+
+// Function - add_node()
+// Adding a neighbor to a node. Do not add if the neighbor is already exists.
+
+// Function - change_map()
+// Complementing neighbors to nodes.
+// example:
+//     before:
+//         a, b c
+//         b, c
+//         c
+//     after:
+//         a, b c
+//         b, c a
+//         c, a b
+
+// Function - size()
+// Check if all nodes are listed.
 
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -24,7 +51,7 @@ impl Graph{
         let mut empty = 0;
         match self.map.get(&node.to_string()){
             None => {
-                println!("missing node");                              
+                                           
             }
             Some(n) => {
                 if n.is_empty() {
@@ -56,17 +83,7 @@ impl Graph{
             self.map.insert(node.to_string(),new_neighbor.to_vec());
         }
     }
-    //pub fn clone()
-    //change_map() is to add neighbors to nodes 
-    //ex:
-    //  before:
-    //      a, b c
-    //      b, c
-    //      c
-    //  after:
-    //      a, b c
-    //      b, c a
-    //      c, a b
+
     pub fn change_map(&mut self) -> Graph{
         let mut newmap = self.clone();
         
@@ -77,7 +94,7 @@ impl Graph{
         }
         newmap
     }
-    pub fn size(&mut self) -> usize {
+    pub fn size(&mut self) -> bool {
         let mut hash:HashSet<&str> = HashSet::new();
         for (vertex,neighbors) in self.map.iter(){
             for s in neighbors {
@@ -88,9 +105,9 @@ impl Graph{
         let input_length = hash.len();
         let map_length = self.map.len();
         if input_length == map_length {
-            input_length
+            true
         }else {
-            panic!("wrong number of nodes");
+            panic!("Wrong number of nodes");
         }
     }
 }
@@ -214,5 +231,5 @@ fn test_size_ok() {
     t.set_index(&vector_b.to_vec());
     t.set_index(&vector_c.to_vec());
     let mut newt = t.change_map();
-    assert_eq!(newt.size(),3);
+    assert_eq!(newt.size(),true);
 }

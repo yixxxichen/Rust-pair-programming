@@ -42,13 +42,9 @@
 // - There must be one start node and one end node, if they are not in the graph,
 // it will display a message. The input will only terminate with 999.
 
-
-
-
 use std::io::{BufRead,BufReader,stdin,Read, Write,stdout};
 use graph::Graph;
 use std::env;
-
 use std::fs::File;
 mod graph;
 mod bfs;
@@ -84,7 +80,9 @@ pub fn read_input<R: Read>(reader: R) -> Graph {
                 graph.set_index(&nodes);
             }
     }
+    graph.size();
     return graph;
+    
 }
 
 pub fn find_path<R: Read, W:Write>(reader: R, writer: &mut W, graph: Graph )  {
