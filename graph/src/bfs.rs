@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::usize::MAX;
 /*
-*
+* Use adjacency list to store the node information
 */
 pub fn bfs(map : &HashMap<String,Vec<String>>,a :String, b :String)-> Vec<String>{
 	let mut queue = vec![a.clone()];
