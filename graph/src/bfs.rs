@@ -5,8 +5,10 @@ use std::usize::MAX;
 * and the value is a vector consist of neighbor vertices.
 * a: The starting point
 * b: The ending point
+*
 * Output: a vector which includes all the nodes of the shortest path.
-*  The visit is a hashmap which stores the node visited preventing the search stuck in a loop.
+* 
+* The algorithm use breadth first search 
 */
 pub fn bfs(map : &HashMap<String,Vec<String>>,a :String, b :String)-> Vec<String>{
 	let mut queue = vec![a.clone()];
