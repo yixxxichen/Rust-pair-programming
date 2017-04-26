@@ -36,7 +36,6 @@ impl Graph{
                 else {
                       for i in 0..n.len(){
                         let mut value = &n[i].to_string();               
-                        //print neighbors
                         if !value.eq(&new_node.to_string()) {
                             check = 0;
                         }
@@ -46,13 +45,10 @@ impl Graph{
                         }                      
                     }
                     if check == 0{
-                        //println!("vertex {}:", vertex);
                         new_neighbor = n.clone();
                         new_neighbor.push(new_node.to_string());
-                        //empty = 1;
                     }
                 }           
-                  
             }
         }
         if empty == 1 && check == 1 {
@@ -61,7 +57,6 @@ impl Graph{
         if empty == 0 && check == 0 {
             self.map.insert(node.to_string(),new_neighbor.to_vec());
         }
-
     }
     //pub fn clone()
     //change_map() is to add neighbors to nodes 
@@ -112,7 +107,6 @@ fn set_index_work() {
     let res = vec!["bb".to_string(),"cc".to_string(),"d".to_string()];
     t.set_index(&vector.to_vec());
     assert_eq!(t.map.get(&"aa".to_string()),Some(&res) );
-
     assert_eq!(t.map.get(&"zz".to_string()),None );
 
 }
