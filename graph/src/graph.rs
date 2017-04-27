@@ -5,27 +5,40 @@
 // Function - new()
 // Create a new Graph
 
-// Function - set_index()
-// It takes a vector of strings, the first element is the key 
-// and rest elements are the value of Graph. 
+// Function - build_graph(vertices: &Vec<String>)
 
-// Function - add_node()
+// This function helps to build the graph. 
+// The input is a vector of strings. First element of the vector is the key(node) 
+// and rest elements are the value(neighbors) of Graph. 
+
+// Function - add_neighbor(node: String, new_node: String)
 // Adding a neighbor to a node. Do not add if the neighbor is already exists.
 
 // Function - change_map()
-// Complementing neighbors to nodes.
-// example:
+// This function is some kind of confusing. Since the graph is undirected, and 
+// sometimes the input file doesn't inlude all two paths between two nodes.
+
+// For example:
 //     before:
 //         a, b c
 //         b, c
 //         c
+
+//     For node 'b', although 'a' and 'b' are connected, it didn't include 'a' as 'b's neighbor,
+// so we add 'a' to 'b's neighbor.
+//     It is similar for 'c'. The initial graph only shows two paths a->c and b->c, so we add
+// c->a and c->b.
+
 //     after:
 //         a, b c
 //         b, c a
 //         c, a b
 
-// Function - size()
-// Check if all nodes are listed.
+// Function - check_size()
+// This original name "size()" is misleading, so I change it to check_size.
+// This function checks if all nodes in the neighbors are listed，and it will panic if not.
+// Actually we don't need to specificlly define the "size()" function. The size of map can be found by
+// "Graph.map.len()"
 
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -40,12 +53,12 @@ impl Graph{
             map: HashMap::new(),
         }
     }
-    pub fn set_index(&mut self, vertices: &Vec<String>) {
+    pub fn build_graph(&mut self, vertices: &Vec<String>) {
             if !self.map.contains_key(&vertices[0].to_string()) {
                 self.map.insert(vertices[0].to_string(), vertices[1..].to_vec());
             }
         }
-    pub fn add_node(&mut self, node: String, new_node: String){
+    pub fn add_neighbor(&mut self, node: String, new_node: String){
         let mut new_neighbor: Vec<String> = vec![];
         let mut check = 1;
         let mut empty = 0;
@@ -89,12 +102,12 @@ impl Graph{
         
         for (vertex,neighbors) in self.map.iter() {
             for s in neighbors {
-                newmap.add_node(s.to_string(),vertex.to_string());          
+                newmap.add_neighbor(s.to_string(),vertex.to_string());          
             }
         }
         newmap
     }
-    pub fn size(&mut self) -> bool {
+    pub fn check_size(&mut self) -> bool {
         let mut hash:HashSet<&str> = HashSet::new();
         for (vertex,neighbors) in self.map.iter(){
             for s in neighbors {
@@ -113,47 +126,47 @@ impl Graph{
 }
     
 #[test]
-fn set_index_work() {
+fn build_graph_work() {
     let mut t = Graph::new();
     let vector = vec!["aa".to_string(),"bb".to_string(),"cc".to_string(),"d".to_string()];
     let res = vec!["bb".to_string(),"cc".to_string(),"d".to_string()];
-    t.set_index(&vector.to_vec());
+    t.build_graph(&vector.to_vec());
     assert_eq!(t.map.get(&"aa".to_string()),Some(&res) );
     assert_eq!(t.map.get(&"zz".to_string()),None );
 
 }
 
 #[test]
-fn test_add_node() {
+fn test_add_neighbor() {
     let mut t = Graph::new();
     let vector_a = vec!["a".to_string(),"b".to_string(),"c".to_string()];
     let vector_b = vec!["b".to_string(),"c".to_string()];
     let vector_c = vec!["c".to_string()];
-    t.set_index(&vector_a.to_vec());
-    t.set_index(&vector_b.to_vec());
-    t.set_index(&vector_c.to_vec());
+    t.build_graph(&vector_a.to_vec());
+    t.build_graph(&vector_b.to_vec());
+    t.build_graph(&vector_c.to_vec());
     let res = vec!["b".to_string(),"c".to_string(),"d".to_string()];
-    t.add_node("a".to_string(),"d".to_string());
+    t.add_neighbor("a".to_string(),"d".to_string());
     assert_eq!(t.map.get(&"a".to_string()),Some(&res));
 }
 
 #[test]
-fn test_add_node_toempty() {
+fn test_add_neighbor_toempty() {
     let mut t = Graph::new();
     let vector_a = vec!["a".to_string()];
-    t.set_index(&vector_a.to_vec());
+    t.build_graph(&vector_a.to_vec());
     let res = vec!["c".to_string()];
-    t.add_node("a".to_string(),"c".to_string());
+    t.add_neighbor("a".to_string(),"c".to_string());
     assert_eq!(t.map.get(&"a".to_string()),Some(&res));
 }
 
 #[test]
-fn test_add_node_nochange() {
+fn test_add_neighbor_nochange() {
     let mut t = Graph::new();
     let vector_a = vec!["a".to_string(),"b".to_string()];
-    t.set_index(&vector_a.to_vec());
+    t.build_graph(&vector_a.to_vec());
     let res = vec!["b".to_string()];
-    t.add_node("a".to_string(),"b".to_string());
+    t.add_neighbor("a".to_string(),"b".to_string());
     assert_eq!(t.map.get(&"a".to_string()),Some(&res));
 }
 
@@ -168,10 +181,10 @@ fn change_map_change_value() {
     let res_b = vec!["a".to_string()];
     let res_c = vec!["a".to_string()];
     let res_d = vec!["a".to_string()];
-    t.set_index(&vector_a.to_vec());
-    t.set_index(&vector_b.to_vec());
-    t.set_index(&vector_c.to_vec());
-    t.set_index(&vector_d.to_vec());
+    t.build_graph(&vector_a.to_vec());
+    t.build_graph(&vector_b.to_vec());
+    t.build_graph(&vector_c.to_vec());
+    t.build_graph(&vector_d.to_vec());
     let newt = t.change_map();
     assert_eq!(newt.map.get(&"a".to_string()),Some(&res_a));
     assert_eq!(newt.map.get(&"b".to_string()),Some(&res_b));
@@ -185,8 +198,8 @@ fn change_map_change_one(){
     let vector_a = vec!["a".to_string(),"b".to_string(),"c".to_string()];
     let vector_b = vec!["b".to_string()];
     let res_b = vec!["a".to_string()];
-    t.set_index(&vector_a.to_vec());
-    t.set_index(&vector_b.to_vec());
+    t.build_graph(&vector_a.to_vec());
+    t.build_graph(&vector_b.to_vec());
     let newt = t.change_map();
     assert_eq!(newt.map.get(&"b".to_string()),Some(&res_b) );
 }
@@ -200,9 +213,9 @@ fn change_map_not_change_value() {
     let res_a = vec!["b".to_string(),"c".to_string()];
     let res_b = vec!["c".to_string(),"a".to_string()];
     let res_c = vec!["a".to_string(),"b".to_string()];
-    t.set_index(&vector_a.to_vec());
-    t.set_index(&vector_b.to_vec());
-    t.set_index(&vector_c.to_vec());
+    t.build_graph(&vector_a.to_vec());
+    t.build_graph(&vector_b.to_vec());
+    t.build_graph(&vector_c.to_vec());
     let newt = t.change_map();
     assert_eq!(newt.map.get(&"a".to_string()),Some(&res_a) );
     assert_eq!(newt.map.get(&"b".to_string()),Some(&res_b) );
@@ -211,25 +224,25 @@ fn change_map_not_change_value() {
 }
 
 // #[test]
-// fn test_size_wrong() {
+// fn test_check_size_wrong() {
 //     let mut t = Graph::new();
 //     let vector_a = vec!["a".to_string(),"b".to_string(),"c".to_string()];
 //     let vector_b = vec!["b".to_string(),"c".to_string(),"a".to_string()];
-//     t.set_index(&vector_a.to_vec());
-//     t.set_index(&vector_b.to_vec());
+//     t.build_graph(&vector_a.to_vec());
+//     t.build_graph(&vector_b.to_vec());
 //     let mut newt = t.change_map();
-//     assert_eq!(newt.size(),2);
+//     assert_eq!(newt.check_size(),2);
 // }
 
 #[test]
-fn test_size_ok() {
+fn test_check_size_ok() {
     let mut t = Graph::new();
     let vector_a = vec!["a".to_string(),"b".to_string(),"c".to_string()];
     let vector_b = vec!["b".to_string(),"c".to_string(),"a".to_string()];
     let vector_c = vec!["c".to_string()];
-    t.set_index(&vector_a.to_vec());
-    t.set_index(&vector_b.to_vec());
-    t.set_index(&vector_c.to_vec());
+    t.build_graph(&vector_a.to_vec());
+    t.build_graph(&vector_b.to_vec());
+    t.build_graph(&vector_c.to_vec());
     let mut newt = t.change_map();
-    assert_eq!(newt.size(),true);
+    assert_eq!(newt.check_size(),true);
 }

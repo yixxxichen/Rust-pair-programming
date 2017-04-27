@@ -25,7 +25,7 @@
 // ->  a c
 //     No path found.
 // ->  a b c 
-//     Input size is not 2
+//     Input check_size is not 2
 // ->  a z
 //     START or END point not found
      
@@ -40,7 +40,7 @@
 // and no node may start more than one line. 
 
 // - There must be one start node and one end node, if they are not in the graph,
-// it will display a message. The input will only terminate with 999.
+// it will display a message. The input will only terminate with "quit".
 
 use std::io::{BufRead,BufReader,stdin,Read, Write,stdout};
 use graph::Graph;
@@ -66,7 +66,6 @@ pub fn read_input<R: Read>(reader: R) -> Graph {
     let mut lines = BufReader::new(reader).lines();
 
     while let Some(Ok(line)) = lines.next() {
-        if line == "999" {break}
             let temp = line.clone();
             let vertices: Vec<&str> = temp.split_whitespace().collect();
             if vertices.is_empty() {
@@ -77,10 +76,10 @@ pub fn read_input<R: Read>(reader: R) -> Graph {
                 for s in &vertices {
                     nodes.push(s.to_string());
                 }
-                graph.set_index(&nodes);
+                graph.build_graph(&nodes);
             }
     }
-    graph.size();
+    graph.check_size();
     return graph;
     
 }
@@ -88,7 +87,7 @@ pub fn read_input<R: Read>(reader: R) -> Graph {
 pub fn find_path<R: Read, W:Write>(reader: R, writer: &mut W, graph: Graph )  {
     let mut lines = BufReader::new(reader).lines();
     while let Some(Ok(line)) = lines.next() {
-        if line == "999" {break}
+        if line == "quit" {break}
         let input_nodes: Vec<&str> = line.split_whitespace().collect();
         if input_nodes.len() != 2 {
             println!("Input size is not 2");
