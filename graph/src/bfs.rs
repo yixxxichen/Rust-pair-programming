@@ -64,5 +64,14 @@ fn test_bfs(){
 	assert_eq!(bfs(&map,"a".to_string(),"c".to_string()),vec!["a","d","c"]);
 	assert_eq!(bfs(&map,"c".to_string(),"a".to_string()), vec!["c","d","a"]);
 	assert_eq!(bfs(&map,"b".to_string(),"a".to_string()), vec!["b","a"]);
-	assert_eq!(bfs(&map,"e".to_string(),"a".to_string()).is_empty(), true);
+
 	}
+
+#[test]
+fn test_bfs_no_such_point(){
+	let mut map = HashMap::new();
+	map.insert("a".to_string(),vec!["b".to_string(),"d".to_string()]);
+	map.insert("b".to_string(),vec!["a".to_string(),"d".to_string()]);
+	map.insert("e".to_string(),vec!["e".to_string()]);
+	assert_eq!(bfs(&map,"e".to_string(),"a".to_string()).is_empty(), true);
+}
