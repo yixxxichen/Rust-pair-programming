@@ -13,21 +13,24 @@ fn main() {
     let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
     let stream = listener.accept().unwrap().0;
     handle_request(stream);
-//      for stream in listener.incoming() {
-//     match stream {
-//         Ok(stream) => {
-//             thread::spawn(move || {
-// 					handle_request(stream);
+    for stream in listener.incoming() {
+        match stream {
+            Ok(stream) => {
+                thread::spawn(move || {
+                        handle_request(stream);
 
-// 				});
-//              println!("success")
-//         }
-//         Err(e) => { println!("connection failed!") }
-//     }
-//  }
+                    });
+                println!("success")
+            }
+            Err(e) => { println!("connection failed!") }
+        }
+}
 
 }
 
 fn handle_request(stream: TcpStream)  {
     let request = request::handle_stream(stream);
+    for i in 0..3{
+        println!("{}",request[i]);
+    }
 }
