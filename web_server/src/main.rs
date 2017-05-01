@@ -14,7 +14,6 @@ mod request;
 fn main() {
     // bind allows us to create a connection on the port
     // and gets it ready to accept connections.
-    test_file_path();
     let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
     let mut log = File::create("log/log.txt");
     match log {
@@ -61,7 +60,6 @@ fn get_response(stream: &mut TcpStream)  {
     match request::check_request(&req) {
         Ok(mut res) => {
             let mut write_res = res.write_response();
-            println!("{}",write_res);
             stream.write_all(write_res.as_bytes());          
         }
         Err(mut e) => {
@@ -78,7 +76,7 @@ fn test_file_path() {
     let local_path = env::current_dir().unwrap();
     let local_path_string = local_path.display().to_string();
     full_path.push_str(&local_path_string);
-    let mypath = "/src";
+    let mypath = "/src/main.txt";
     full_path.push_str(mypath);
     let path = Path::new(&full_path);
     if path.exists() {
@@ -97,6 +95,6 @@ fn test_file_path() {
         };
     }
     else {
-        println!("{}","NO PATH");
+        println!("{}","NO SUCH PATH/FILE");
     }
 }
