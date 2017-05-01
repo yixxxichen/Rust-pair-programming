@@ -32,20 +32,24 @@ impl Response {
         res.push_str(&self.file_content);
         //res = self.protocal + &self.status_code.clone() +&self.server_name.clone() + &self.file_type.clone() + &leng.clone() + &self.file_content.clone();
         return res;
-        //let stream = res.as_bytes();
-             
     }
-    
 }
 
 pub enum Error {
-	
 	ERROR400,
 	ERROR403,
 	ERROR404,
 }
+impl Error {
+    pub fn write_error(&mut self) -> String {
+        match *self {
+            Error::ERROR400 => return "400 Bad Request".to_string(),
+            Error::ERROR403 => return "403 Forbidden".to_string(),
+            Error::ERROR404 => return "404 Not Found".to_string(), 
+        }
+    }
+}
 
-#[derive(Debug)]
 pub enum Good {
     OK200,
     
@@ -57,7 +61,12 @@ pub fn handle_stream(stream: &mut TcpStream) -> Vec<String> {
     let mut input = String::new();
     let mut res: Vec<String> = Vec::new();
     while let Some(Ok(line)) = reader.next(){
-        //println!("{}",line);
+        if line == "999" {
+            break
+        }
+        if line == "\n".to_owned() || line == "\r\n".to_owned(){   
+            break						
+        }
         let lines: Vec<&str> = line.split_whitespace().collect();
         //let mut temp = line.split_whitespace();
         for s in &lines{
@@ -80,7 +89,7 @@ pub fn check_request(req: &Vec<String>) -> Result<Good,Error> {
         return Err(Error::ERROR400);
     }
     let check_GET = &req[0];
-    let get_path = &req[1];
+    let get_path  = &req[1];
     let protocol  = &req[2];
     if check_GET == "GET" && protocol.contains("HTTP") {
         //check file exists - ERR404
@@ -94,7 +103,7 @@ pub fn check_request(req: &Vec<String>) -> Result<Good,Error> {
             }
         }
         else {
-            return Err(Error::ERROR403)
+            return Err(Error::ERROR404)
         }
     }
     else {
@@ -127,10 +136,6 @@ pub fn create_response(req: &Vec<String>) -> Response{
     }
 
 }
-
-
-
-
 // New function to write back with!
 pub fn send_response(mut stream: TcpStream) {
     // Write the header and the html body
