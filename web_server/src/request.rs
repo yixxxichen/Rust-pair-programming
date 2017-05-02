@@ -70,7 +70,7 @@ pub fn get_request(stream: &mut TcpStream) -> Vec<String> {
         }
         //check the end of input
         let byte = oneline.as_bytes();
-        if byte.len()<128 {
+        if byte.len()<256 {
             break
         }
     }
@@ -84,8 +84,8 @@ pub fn get_request(stream: &mut TcpStream) -> Vec<String> {
 pub fn check_request(req: &Vec<String>) -> Result<Response,Error> {
     //check request format: - ERR400
     //GET
-    //PATH
-    //protocol
+    //valid path
+    //protocol (HTTP)
     if req.len() < 3 {
         return Err(Error::ERROR400);
     }
@@ -105,7 +105,7 @@ pub fn check_request(req: &Vec<String>) -> Result<Response,Error> {
             match fs::metadata(&file_path) {
             Ok(meta) => {
                 let file_type = meta.file_type();
-                //check if path is a dir
+                //check if path is a dir, find index files in this path
                 if file_type.is_dir() {
                     let names = vec!["/index.html","/index.shtml","/index.txt"];
                     return check_file(&names, req, &full_path);
