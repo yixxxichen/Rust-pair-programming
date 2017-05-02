@@ -1,16 +1,13 @@
 use std::io::{BufRead,BufReader,Read};
 use std::env;
 use std::fs::File;
-use std::fs;
 use std::path::Path;
 use std::net::TcpStream;
-// use std::thread;
 
 pub struct Response {
 	protocal: String,
 	status_code: String,
 	server_name: String,
-    // file_url: String,
 	file_type: String,
 	file_length: usize,
 	file_content: String,
@@ -18,7 +15,7 @@ pub struct Response {
 
 impl Response {
     pub fn write_response(&mut self) -> String {
-        let res = format!("{} {} {}\nContent-type: {}\nContent-length: {}\n\n{}\n",
+        let res = format!("{} {}{}\nContent-type: {}\nContent-length: {}\n\n{}\n",
         self.protocal,self.status_code,self.server_name,self.file_type,self.file_length,self.file_content);
         return res;
     }
@@ -26,10 +23,6 @@ impl Response {
         let code = self.status_code.to_owned();
         return code;
     }
-
-    // pub fn get_url(&mut self) -> String {
-    //     return self.file_url.to_owned();
-    // }
 }
 
 pub enum Error {
@@ -45,33 +38,26 @@ impl Error {
             Error::ERROR404 => return "404 Not Found\n".to_string(), 
         }
     }
-    pub fn get_error_code(&mut self) -> String {
-        match *self {
-            Error::ERROR400 => return "400".to_string(),
-            Error::ERROR403 => return "403".to_string(),
-            Error::ERROR404 => return "404".to_string(), 
-        }
-    }
 }
-// pub enum Good {
-//     OK200,   
-// }
+
 //Get stream content and return in Vec<String>
 pub fn get_request(stream: &mut TcpStream) -> Vec<String> {
     let mut reader = BufReader::new(stream).lines();
     let mut res: Vec<String> = Vec::new();
     while let Some(Ok(line)) = reader.next(){
-        let oneline = line.clone();
+        //let oneline = line.clone();
         //put requests into a vector
         let lines: Vec<&str> = line.split_whitespace().collect();
         for s in &lines{
             res.push(s.to_string());
         }
-        //check the end of input
-        let byte = oneline.as_bytes();
-        if byte.len()<256 {
-            break
-        }
+        //only read one line
+
+        // let byte = oneline.as_bytes();
+        // if byte.len()<256 {
+        //     break
+        // }
+        break
     }
     return res;
 }
@@ -91,7 +77,7 @@ pub fn check_request(req: &Vec<String>) -> Result<Response,Error> {
     let check_get = &req[0];
     let get_path  = &req[1];
     let protocol  = &req[2];
-    if check_get == "GET" && protocol.contains("HTTP") {
+    if check_get == "GET" && protocol.starts_with("HTTP") {
         //check file exists - ERR404
         let mut full_path = String::new();
         // We assume that we are in a valid directory.
@@ -101,32 +87,26 @@ pub fn check_request(req: &Vec<String>) -> Result<Response,Error> {
         full_path.push_str(&get_path);
         let file_path = Path::new(&full_path);
         if file_path.exists() {
-            match fs::metadata(&file_path) {
-            Ok(meta) => {
-                let file_type = meta.file_type();
-                //check if path is a dir, find index files in this path
-                if file_type.is_dir() {
-                    let names = vec!["/index.html","/index.shtml","/index.txt"];
-                    return check_file(&names, req, &full_path);
-                }
-                else {
-                    //check if path is a file
-                   if file_type.is_file(){
-                    match File::open(&file_path){
-                        Ok(_) => {
-                            return Ok(create_response(req, &full_path));
-                        }
-                        Err(_) => {return Err(Error::ERROR403);}
+            //check if path is a dir, find index files in this path
+            if file_path.is_dir() {
+                let names = vec!["/index.html","/index.shtml","/index.txt"];
+                return check_file(&names, req, &full_path);
+            }
+            else {
+                //check if path is a file
+                if file_path.is_file(){
+                match File::open(&file_path){
+                    Ok(_) => {
+                        return Ok(create_response(req, &full_path));
                     }
-                   }
-                   //if not return ERROR 404
-                   else {
-                       return Err(Error::ERROR404);
-                   }
+                    Err(_) => {return Err(Error::ERROR403);}
+                }
+                }
+                //if not return ERROR 404
+                else {
+                    return Err(Error::ERROR404);
                 }
             }
-            Err(_) => return Err(Error::ERROR404),
-        }
         }
         else {
             // path does't exist
@@ -157,15 +137,16 @@ fn check_file(names: &Vec<&str>, req: &Vec<String>, path :&str) -> Result<Respon
     //if no file found, return error 404
     return Err(Error::ERROR404);
 }
-
+//Get the file
 pub fn create_response(req: &Vec<String>, path :&str) -> Response{
     let get_path = &path;
     let protocal_info  = &req[2];
     let file_path = Path::new(&get_path);
     let mut buf = String::new();
+    // open file
     let mut f = File::open(&file_path).unwrap();
     let mut content_type = "text/plain".to_string();
-    if get_path.contains("html") {
+    if get_path.contains(".html") {
          content_type = "text/html".to_string();
     }
 
@@ -173,12 +154,10 @@ pub fn create_response(req: &Vec<String>, path :&str) -> Response{
         protocal    : protocal_info.to_string(),
         status_code : "200 OK\n".to_string(),
         server_name : "web-server/0.1".to_string(),
-        // file_url    : get_path.to_string(),
         file_type   : content_type,
         file_length : f.read_to_string(&mut buf).unwrap(),
         file_content: buf,
     }
-
 }
 #[cfg(test)]
 mod test{

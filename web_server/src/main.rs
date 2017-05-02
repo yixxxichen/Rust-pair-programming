@@ -1,8 +1,6 @@
 extern crate time;
 use std::io::{Write};
 use std::fs::File;
-// use std::io::prelude::*;
-// use std::path::Path;
 use std::net::{TcpListener, TcpStream};
 use std::thread;
 use std::sync::{Arc,Mutex};
@@ -42,12 +40,15 @@ fn main() {
 fn write_to_log(logs: &mut Arc<Mutex<File>>, req:&Vec<String>, code:&str ) {
     
     let mut log_lock = logs.lock().unwrap();
-    let mut url  = req[1].to_string();
+    let url;
     if req.len()< 2 {
         url = "".to_string();
     }
+    else {
+        url  = req[1].to_string();
+    }
     let timestamp = get_time();
-    let all_log = format!("{} - {} - {}", timestamp, url, code);
+    let all_log = format!("{} \"{}\" {}", timestamp, url, code);
     match log_lock.write_all(all_log.as_bytes()){
         Ok(_)   => {println!("Successful Log");}
         Err(_)  => {println!("Can't write into log");}
@@ -57,25 +58,22 @@ fn write_to_log(logs: &mut Arc<Mutex<File>>, req:&Vec<String>, code:&str ) {
 //get current time 
 fn get_time() -> String {
     let timespec = time::now();
-    let res = time::strftime("%Y/%m/%d %H:%M:%S",&timespec).unwrap();
+    let res = time::strftime("%d/%m/%Y: %H:%M:%S",&timespec).unwrap();
     return res;
 }
 
 fn get_response(stream: &mut TcpStream, logs: &mut Arc<Mutex<File>>)  {
     let req = request::get_request(stream);
-    //let mut code_url:Vec<String> = vec![];  
     match request::check_request(&req) {
         Ok(mut res) => {
             let write_res = res.write_response();
             let code = res.get_res_code();
-            // let url = res.get_url();
             write_to_log(logs,&req,&code); 
             stream.write_all(write_res.as_bytes()).unwrap(); 
         }
         Err(mut e) => {
             let write_err = e.write_error();
             let code = write_err.clone();
-            //let url = &req[1].to_string();
             write_to_log(logs,&req,&code);
             stream.write_all(write_err.as_bytes()).unwrap();
         } 
