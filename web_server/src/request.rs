@@ -10,6 +10,7 @@ pub struct Response {
 	protocal: String,
 	status_code: String,
 	server_name: String,
+    file_url: String,
 	file_type: String,
 	file_length: usize,
 	file_content: String,
@@ -17,10 +18,17 @@ pub struct Response {
 
 impl Response {
     pub fn write_response(&mut self) -> String {
-        let res = format!("{} {}\n{}\nContent-type: {}\nContent-length: {}\n{}\n",
+        let res = format!("{} {} {}\nContent-type: {}\nContent-length: {}\n{}\n",
         self.protocal,self.status_code,self.server_name,self.file_type,self.file_length,self.file_content);
         return res;
+    }
+    pub fn get_res_code(&mut self) -> String {
+        let code = self.status_code.to_owned();
+        return code;
+    }
 
+    pub fn get_url(&mut self) -> String {
+        return self.file_url.to_owned();
     }
 }
 
@@ -37,54 +45,34 @@ impl Error {
             Error::ERROR404 => return "404 Not Found\n".to_string(), 
         }
     }
-}
-
-pub enum Good {
-    OK200,
-    
-}
-
-
-/////test
-pub fn read_stream(stream: &mut TcpStream) -> Vec<String> {
-	let mut buf = [0; 128];
-	let mut contents = String::new();
-    let mut res: Vec<String> = Vec::new();
-	while let Ok(bytes_read) = stream.read(&mut buf) {
-		let c = String::from_utf8(buf.to_vec()).unwrap();
-		contents.push_str(&c);
-		// println!("{}", bytes_read);
-
-		//in case response does not take up all of buffer
-		if bytes_read < 128 { break; }
-	}
-    println!("{}",contents);
-    let lines: Vec<&str> = contents.split_whitespace().collect();
-    for s in &lines{
-    res.push(s.to_string());
+    pub fn get_error_code(&mut self) -> String {
+        match *self {
+            Error::ERROR400 => return "400".to_string(),
+            Error::ERROR403 => return "403".to_string(),
+            Error::ERROR404 => return "404".to_string(), 
+        }
     }
-    return res;
 }
-
-
-
+pub enum Good {
+    OK200,   
+}
 //Get stream content and return in Vec<String>
 pub fn get_request(stream: &mut TcpStream) -> Vec<String> {
     let mut reader = BufReader::new(stream).lines();
     let mut input = String::new();
     let mut res: Vec<String> = Vec::new();
     while let Some(Ok(line)) = reader.next(){
-        if line == "999" {
-            break
-        }
-        if line == "\n".to_owned() || line == "\r\n".to_owned(){   
-            break						
-        }
+        let oneline = line.clone();
+        //put requests into a vector
         let lines: Vec<&str> = line.split_whitespace().collect();
-        //let mut temp = line.split_whitespace();
         for s in &lines{
             res.push(s.to_string());
-            }       
+        }
+        //check the end of input
+        let byte = oneline.as_bytes();
+        if byte.len()<128 {
+            break
+        }
     }
     return res;
 }
@@ -175,7 +163,6 @@ pub fn create_response(req: &Vec<String>, path :&str) -> Response{
     let check_GET = &req[0];
     let get_path = &path;
     let protocal_info  = &req[2];
-    println!("protocal: {}", protocal_info);
     let file_path = Path::new(&get_path);
     let mut buf = String::new();
     let mut f = File::open(&file_path).unwrap();
@@ -189,17 +176,12 @@ pub fn create_response(req: &Vec<String>, path :&str) -> Response{
 
     Response{
         protocal    : protocal_info.to_string(),
-        status_code : "200 OK".to_string(),
+        status_code : "200 OK\n".to_string(),
         server_name : "web-server/0.1".to_string(),
+        file_url    : get_path.to_string(),
         file_type   : content_type,
         file_length : f.read_to_string(&mut buf).unwrap(),
         file_content: buf,
     }
 
-}
-// New function to write back with!
-pub fn send_response(mut stream: TcpStream) {
-    // Write the header and the html body
-    let response = "HTTP/1.1 200 OK\n\n<html><body>Hello, World!</body></html>";
-    stream.write_all(response.as_bytes()).unwrap();
 }
