@@ -10,7 +10,7 @@ pub struct Response {
 	protocal: String,
 	status_code: String,
 	server_name: String,
-    file_url: String,
+    // file_url: String,
 	file_type: String,
 	file_length: usize,
 	file_content: String,
@@ -88,10 +88,10 @@ pub fn check_request(req: &Vec<String>) -> Result<Response,Error> {
     if req.len() < 3 {
         return Err(Error::ERROR400);
     }
-    let check_GET = &req[0];
+    let check_get = &req[0];
     let get_path  = &req[1];
     let protocol  = &req[2];
-    if check_GET == "GET" && protocol.contains("HTTP") {
+    if check_get == "GET" && protocol.contains("HTTP") {
         //check file exists - ERR404
         let mut full_path = String::new();
         // We assume that we are in a valid directory.
@@ -159,7 +159,6 @@ fn check_file(names: &Vec<&str>, req: &Vec<String>, path :&str) -> Result<Respon
 }
 
 pub fn create_response(req: &Vec<String>, path :&str) -> Response{
-    let check_GET = &req[0];
     let get_path = &path;
     let protocal_info  = &req[2];
     let file_path = Path::new(&get_path);
@@ -174,7 +173,7 @@ pub fn create_response(req: &Vec<String>, path :&str) -> Response{
         protocal    : protocal_info.to_string(),
         status_code : "200 OK\n".to_string(),
         server_name : "web-server/0.1".to_string(),
-        file_url    : get_path.to_string(),
+        // file_url    : get_path.to_string(),
         file_type   : content_type,
         file_length : f.read_to_string(&mut buf).unwrap(),
         file_content: buf,
