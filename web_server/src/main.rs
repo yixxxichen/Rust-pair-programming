@@ -78,21 +78,14 @@ fn get_response(stream: &mut TcpStream, logs: &mut Arc<Mutex<File>>)  {
             let code = res.get_res_code();
             let url = res.get_url();
             write_to_log(logs,&req,&code); 
-            stream.write_all(write_res.as_bytes()); 
-            //code_url.push(code);
-            //code_url.push(url); 
-
-               
+            stream.write_all(write_res.as_bytes()).unwrap(); 
         }
         Err(mut e) => {
             let mut write_err = e.write_error();
             let code = write_err.clone();
             //let url = &req[1].to_string();
             write_to_log(logs,&req,&code);
-            stream.write_all(write_err.as_bytes());
-            //code_url.push(code);
-            //code_url.push(url.to_string()); 
-            
+            stream.write_all(write_err.as_bytes()).unwrap();
         } 
     }
 }

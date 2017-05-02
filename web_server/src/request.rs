@@ -18,7 +18,7 @@ pub struct Response {
 
 impl Response {
     pub fn write_response(&mut self) -> String {
-        let res = format!("{} {} {}\nContent-type: {}\nContent-length: {}\n{}\n",
+        let res = format!("{} {} {}\nContent-type: {}\nContent-length: {}\n\n{}\n",
         self.protocal,self.status_code,self.server_name,self.file_type,self.file_length,self.file_content);
         return res;
     }
