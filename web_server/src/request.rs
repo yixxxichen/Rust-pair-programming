@@ -1,10 +1,10 @@
-use std::io::{BufRead,BufReader,stdin,Read, Write,stdout};
+use std::io::{BufRead,BufReader,Read};
 use std::env;
 use std::fs::File;
 use std::fs;
 use std::path::Path;
-use std::net::{TcpListener, TcpStream};
-use std::thread;
+use std::net::TcpStream;
+// use std::thread;
 
 pub struct Response {
 	protocal: String,
@@ -27,9 +27,9 @@ impl Response {
         return code;
     }
 
-    pub fn get_url(&mut self) -> String {
-        return self.file_url.to_owned();
-    }
+    // pub fn get_url(&mut self) -> String {
+    //     return self.file_url.to_owned();
+    // }
 }
 
 pub enum Error {
@@ -53,13 +53,12 @@ impl Error {
         }
     }
 }
-pub enum Good {
-    OK200,   
-}
+// pub enum Good {
+//     OK200,   
+// }
 //Get stream content and return in Vec<String>
 pub fn get_request(stream: &mut TcpStream) -> Vec<String> {
     let mut reader = BufReader::new(stream).lines();
-    let mut input = String::new();
     let mut res: Vec<String> = Vec::new();
     while let Some(Ok(line)) = reader.next(){
         let oneline = line.clone();
@@ -114,7 +113,7 @@ pub fn check_request(req: &Vec<String>) -> Result<Response,Error> {
                     //check if path is a file
                    if file_type.is_file(){
                     match File::open(&file_path){
-                        Ok(get_file) => {
+                        Ok(_) => {
                             return Ok(create_response(req, &full_path));
                         }
                         Err(_) => {return Err(Error::ERROR403);}
@@ -141,7 +140,7 @@ pub fn check_request(req: &Vec<String>) -> Result<Response,Error> {
 }
 
 fn check_file(names: &Vec<&str>, req: &Vec<String>, path :&str) -> Result<Response,Error> {
-    let mut full_path = path;
+    let full_path = path;
     for s in names{
         let mut file_path = full_path.clone().to_string();
         file_path.push_str(&s);
@@ -166,12 +165,9 @@ pub fn create_response(req: &Vec<String>, path :&str) -> Response{
     let file_path = Path::new(&get_path);
     let mut buf = String::new();
     let mut f = File::open(&file_path).unwrap();
-    let mut content_type = String::new();
+    let mut content_type = "text/plain".to_string();
     if get_path.contains("html") {
-        content_type = "text/html".to_string();
-    }
-    else {
-        content_type = "text/plain".to_string();
+         content_type = "text/html".to_string();
     }
 
     Response{
@@ -184,4 +180,87 @@ pub fn create_response(req: &Vec<String>, path :&str) -> Response{
         file_content: buf,
     }
 
+}
+#[cfg(test)]
+mod test{
+    // use super::Response;
+    use super::Error;
+    use request::check_file;
+    use request::check_request;
+    #[test]
+    fn test_error_write_error(){
+        assert_eq!("400 Bad Request\n".to_string(), Error::ERROR400.write_error());
+        assert_eq!("403 Forbidden\n".to_string(), Error::ERROR403.write_error());
+        assert_eq!("404 Not Found\n".to_string(), Error::ERROR404.write_error());
+    }
+    #[test]
+    fn test_error_get_error(){
+        assert_eq!("400".to_string(), Error::ERROR400.get_error_code());
+        assert_eq!("403".to_string(), Error::ERROR403.get_error_code());
+        assert_eq!("404".to_string(), Error::ERROR404.get_error_code());
+    }
+    #[test]
+    fn test_check_request_404(){
+        let temp = vec!["GET".to_string(),"/src/wrong.rs".to_string(),"HTTP".to_string()];
+        match check_request(&temp) {
+            Ok(mut res) =>{
+                assert_eq!(res.get_res_code(),"404".to_string());
+            }
+            Err(mut e) =>{
+                assert_eq!(e.get_error_code(),"404".to_string());
+            }
+        }
+    }
+    #[test]
+    fn test_check_request_400(){
+        let temp = vec!["SET".to_string(),"/src/wrong.rs".to_string(),"HTTP".to_string()];
+        match check_request(&temp) {
+            Ok(mut res) =>{
+                assert_eq!(res.get_res_code(),"400".to_string());
+            }
+            Err(mut e) =>{
+                assert_eq!(e.get_error_code(),"400".to_string());
+            }
+        }
+    }
+    #[test]
+    fn test_check_request_200(){
+        let temp = vec!["GET".to_string(),"/src/main.rs".to_string(),"HTTP".to_string()];
+        match check_request(&temp) {
+            Ok(mut res) =>{
+                assert_eq!(res.get_res_code(),"200 OK\n".to_string());
+            }
+            Err(mut e) =>{
+                assert_eq!(e.get_error_code(),"404".to_string());
+            }
+        }
+    }
+    #[test]
+    fn test_check_file_404(){
+        let names = vec!["/index.html","/index.shtml","/index.txt"];
+        let temp = vec!["GET".to_string(),"/src/main.rs".to_string(),"HTTP".to_string()];
+        let path = "/src/main";
+        match check_file(&names,&temp,&path) {
+            Ok(mut res) => {
+                assert_eq!(res.get_res_code(),"404".to_string());
+            }
+            Err(mut e) => {
+                assert_eq!(e.get_error_code(),"404".to_string());
+            },
+        }
+    }
+    #[test]
+    fn test_check_file_200(){
+        let names = vec!["/index.html","/index.shtml","/index.txt"];
+        let temp = vec!["GET".to_string(),"/src/main.rs".to_string(),"HTTP".to_string()];
+        let path = "/src/main.rs";
+        match check_file(&names,&temp,&path) {
+            Ok(mut res) => {
+                assert_eq!(res.get_res_code(),"200".to_string());
+            }
+            Err(mut e) => {
+                assert_eq!(e.get_error_code(),"404".to_string());
+            },
+        }
+    }
 }
