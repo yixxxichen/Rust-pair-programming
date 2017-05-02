@@ -61,7 +61,10 @@ fn write_to_log(logs: &mut Arc<Mutex<File>>, req:&Vec<String>, code:&str ) {
     }
 
 }
+#[test]
+fn test_write_log(){
 
+}
 //get current time 
 fn get_time() -> String {
     let timespec = time::now();
@@ -87,35 +90,5 @@ fn get_response(stream: &mut TcpStream, logs: &mut Arc<Mutex<File>>)  {
             write_to_log(logs,&req,&code);
             stream.write_all(write_err.as_bytes()).unwrap();
         } 
-    }
-}
-
-
-fn test_file_path() {
-    let mut full_path = String::new();
-    // We assume that we are in a valid directory.
-    let local_path = env::current_dir().unwrap();
-    let local_path_string = local_path.display().to_string();
-    full_path.push_str(&local_path_string);
-    let mypath = "/src/main.txt";
-    full_path.push_str(mypath);
-    let path = Path::new(&full_path);
-    if path.exists() {
-        //try to open file
-        let mut meta = match fs::metadata(&path) {
-            Ok(m) => {
-                let file_type = m.file_type();
-                if file_type.is_file() {
-                    panic!("FILE FOUND");
-                }
-                else {
-                    panic!("WRONG");
-                }
-            }
-            Err(_) => panic!("NOT FOUND"),
-        };
-    }
-    else {
-        println!("{}","NO SUCH PATH/FILE");
     }
 }
