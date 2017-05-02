@@ -45,18 +45,12 @@ pub fn get_request(stream: &mut TcpStream) -> Vec<String> {
     let mut reader = BufReader::new(stream).lines();
     let mut res: Vec<String> = Vec::new();
     while let Some(Ok(line)) = reader.next(){
-        //let oneline = line.clone();
         //put requests into a vector
         let lines: Vec<&str> = line.split_whitespace().collect();
         for s in &lines{
             res.push(s.to_string());
         }
         //only read one line
-
-        // let byte = oneline.as_bytes();
-        // if byte.len()<256 {
-        //     break
-        // }
         break
     }
     return res;
