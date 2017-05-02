@@ -1,7 +1,0 @@
-2017/05/01 19:21:13 - scr/ - 400 Bad Request
-2017/05/01 19:21:26 - /src - 400 Bad Request
-2017/05/01 19:21:37 - /src - 200 OK
-2017/05/01 19:21:45 - /src - 200 OK
-2017/05/01 19:21:45 - /favicon.ico - 404 Not Found
-2017/05/01 19:21:52 - /src/main.rs - 200 OK
-2017/05/01 19:21:52 - /favicon.ico - 404 Not Found
